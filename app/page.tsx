@@ -2,27 +2,26 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <section className="main">
-        <Image src="/vercel.svg" alt="My self" />
-        <h2></h2>
-      </section>
-      <section className="description">
-        <h3></h3>
-        <p></p>
-      </section>
-      <section className="description">
-        <h3></h3>
-        <p></p>
-      </section>
-      <section className="description">
-        <h3></h3>
-        <p></p>
-      </section>
-      <section className="description">
-        <h3></h3>
-        <p></p>
-      </section>
-    </main>
+    <section className="flex flex-col items-center justify-center leading-8 p-8 rounded shadow-lg backdrop-blur card">
+      <div className="flex items-center p-5">
+        <Image
+          src="/author.png"
+          alt="Author"
+          className="rounded-full"
+          width={100}
+          height={24}
+          priority
+        />
+        <span className="italic text-xl m-5">毛稚文</span>
+      </div>
+      <p>具有前端开发、研发, 设计交互, 用户体验优化的经验。</p>
+      <p>后端 C# 开发经验</p>
+      <p>数学基础扎实, 良好的逻辑思维与学习能力</p>
+      <h2 className="overline font-bold">开发工程师</h2>
+      <p className="mt-5 italic">交互设计 | 技术设计 | 用户体验 | 项目管理</p>
+      <p>
+        Javascript | Typescript | C# | Vue | React | NodeJS | D3.js | ElementUI
+      </p>
+    </section>
   );
 }
