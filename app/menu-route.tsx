@@ -5,20 +5,16 @@ import Link from "next/link";
 
 const items: MenuProps["items"] = [
   {
-    key: "login",
-    label: <Link href="/login">login</Link>,
-  },
-  {
     key: "resume",
-    label: <Link href="/resume">resume</Link>,
+    label: <Link href="/resume">简历</Link>,
   },
   {
     key: "chatroom",
-    label: <Link href="/chatroom">chatroom</Link>,
+    label: <Link href="/chatroom">聊天室</Link>,
   },
   {
     key: "shop",
-    label: <Link href="/shop">shop</Link>,
+    label: <Link href="/shop">商店</Link>,
   },
 ];
 

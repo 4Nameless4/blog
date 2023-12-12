@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import MenuRoute from "./menu-route";
 import Link from "next/link";
 import "./globals.css";
+import User from "./user";
+import { useReducer } from "react";
 
 export const metadata: Metadata = {
   title: "MZW Blog",
@@ -30,16 +32,12 @@ export default function RootLayout({
             </Link>
           </div>
           <div className="flex gap-4">
-            <Link href="/login">
-              <i className="fa-regular fa-user icon"></i>
-            </Link>
+            <User />
 
             <MenuRoute />
           </div>
         </header>
-        <main className="flex flex-col items-center justify-center p-24 flex-1">
-          {children}
-        </main>
+        <main className="grid p-24 flex-1 overflow-hidden">{children}</main>
       </body>
     </html>
   );
