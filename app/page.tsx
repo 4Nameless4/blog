@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function Home() {
   return (
-    <section className="flex flex-col items-center justify-evenly leading-8 p-8 rounded shadow-lg backdrop-blur card">
+    <section className="card flex flex-col items-center justify-evenly leading-8 p-8 rounded shadow-lg backdrop-blur relative left-2/4 top-2/4 -translate-x-1/2 -translate-y-1/2 w-auto w-fit h-fit">
       <div className="flex flex-col items-center justify-center">
         <div className="flex items-center p-5">
           <Image
@@ -10,7 +10,7 @@ export default function Home() {
             alt="Author"
             className="rounded-full"
             width={100}
-            height={24}
+            height={100}
             priority
           />
           <span className="italic text-xl m-5">毛稚文</span>
@@ -20,13 +20,13 @@ export default function Home() {
         <p>数学基础扎实, 良好的逻辑思维与学习能力</p>
         <h2 className="overline font-bold">开发工程师</h2>
       </div>
-      <footer className="flex items-center flex-col">
+      <div className="flex items-center flex-col">
         <p className="italic">交互设计 | 技术设计 | 用户体验 | 项目管理</p>
         <p className="font-bold">
           Javascript | Typescript | C# | Vue | React | NodeJS | D3.js |
           ElementUI
         </p>
-      </footer>
+      </div>
     </section>
   );
 }
