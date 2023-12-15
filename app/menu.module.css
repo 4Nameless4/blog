@@ -1,0 +1,56 @@
+.root {
+  --padding-icon: 0.2rem;
+  --main-size: calc(var(--padding-icon) + var(--icon-size));
+
+  box-sizing: border-box;
+  width: var(--main-size);
+  height: var(--main-size);
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 99999;
+  padding: var(--padding-icon);
+  background-color: red;
+  border-radius: 50%;
+}
+.root::before {
+  content: "";
+  position: absolute;
+  width: 200%;
+  height: 200%;
+  left: 0;
+  top: 0;
+  transform: translate(-39.64466094067262%, -39.64466094067262%);
+  background-color: #c1c1c1;
+  backdrop-filter: blur(10px);
+  z-index: 99;
+  border-radius: 50%;
+}
+.btn {
+  display: block;
+  position: relative;
+  z-index: 999;
+}
+.root object {
+  pointer-events: none;
+}
+.list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 88;
+  background-color: #acacac16;
+  backdrop-filter: blur(10px);
+  position: absolute;
+  left: 0;
+  box-sizing: border-box;
+  width: 100%;
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+  will-change: transform;
+}
+:where(.btn, .root):hover .list {
+  transform: translateX(0);
+}

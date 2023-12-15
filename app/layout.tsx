@@ -3,6 +3,7 @@ import MenuRoute from "./menu-route";
 import Link from "next/link";
 import "./globals.css";
 import User from "./user";
+import Menu from "./menu";
 
 export const metadata: Metadata = {
   title: "MZW Blog",
@@ -16,17 +17,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <head>
-        <link rel="stylesheet" href="/all.min.css"></link>
-      </head>
       <body className="min-h-screen flex flex-col">
-        <header
-          className="sticky top-0 flex items-center justify-between p-5 backdrop-blur z-10 shadow"
-          style={{
-            backgroundColor: "#9ca3a91c",
-          }}
-        >
-          <div className="flex gap-4">
+        <header className="contents">
+          <Menu />
+          {/* <div className="flex gap-4">
             <Link href="/">
               <i className="fa-solid fa-house icon"></i>
             </Link>
@@ -40,7 +34,7 @@ export default function RootLayout({
           <div className="flex gap-4">
             <User />
             <MenuRoute />
-          </div>
+          </div> */}
         </header>
         <main className="grid p-24 flex-1 overflow-hidden z-0">{children}</main>
       </body>

@@ -1,4 +1,5 @@
 "use client";
+import { Avatar } from "antd";
 import Link from "next/link";
 import { useReducer } from "react";
 
@@ -40,7 +41,7 @@ export function useUser() {
 export default function User() {
   return (
     <Link href="/login">
-      <i className="fa-regular fa-user icon"></i>
+      <Avatar size={64} icon={<i className="fa-regular fa-user icon"></i>} />
     </Link>
   );
 }

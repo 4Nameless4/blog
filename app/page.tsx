@@ -6,8 +6,8 @@ export default function Home() {
       <div className="flex flex-col items-center justify-center">
         <div className="flex items-center p-5">
           <Image
-            src="/author.png"
-            alt="Author"
+            src="/infinity.svg"
+            alt="My icon"
             className="rounded-full"
             width={100}
             height={100}
