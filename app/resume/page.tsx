@@ -9,6 +9,7 @@ import { getJSON } from "./get";
 
 function base64ToBytes(base64: string) {
   const binString = window.atob(base64);
+
   return new TextDecoder().decode(
     Uint8Array.from(binString as any, (m: any) => m.codePointAt(0))
   );
@@ -43,8 +44,12 @@ export default function ResumePage() {
       getJSON(),
       fetch("/resumeTemplate.docx").then((r) => r.blob()),
     ]).then(([json, blob]) => {
-      if (!blob || !json) return;
-      const jsonObj = JSON.parse(base64ToBytes(json));
+      if (!blob) return;
+      let jsonObj = {};
+      try {
+        jsonObj = JSON.parse(base64ToBytes(json));
+      } catch (e) {}
+
       setResumeJSON(jsonObj);
       blob.arrayBuffer().then((d) => {
         const fillBlob = fillResumeTemplate(d, jsonObj);
