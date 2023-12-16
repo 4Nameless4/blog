@@ -1,11 +1,12 @@
 "use client";
 import { FloatButton, Modal, Spin } from "antd";
-import { renderAsync } from "docx-preview";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Pizzip from "pizzip";
 import DocxTemplater from "docxtemplater";
 import { saveAs } from "file-saver";
 import { getJSON } from "./get";
+import style from "./page.module.css";
+import UseSVG from "../usesvg";
 
 function base64ToBytes(base64: string) {
   const binString = window.atob(base64);
@@ -60,26 +61,46 @@ export default function ResumePage() {
   useEffect(() => {
     try {
       const el = resume.current;
-      if (!el || !resumeFillBlob) return;
-      renderAsync(resumeFillBlob, el);
+      if (!isModalOpen || !el || !resumeFillBlob) return;
+
+      import("docx-preview").then(({ renderAsync }) => {
+        renderAsync(resumeFillBlob, el);
+      });
     } catch (e) {
       console.error(e);
     }
-  }, [() => resume.current]);
+  }, [isModalOpen, resumeFillBlob]);
 
   function _download() {
     if (!resumeFillBlob) return;
     saveAs(resumeFillBlob, "resume.docx");
-    // if (!base64) return;
-    // download(`data:application/octet-stream;base64,${base64}`, "resume.docx");
   }
   function getDescSec() {
     const data = (resumeJSON && resumeJSON["projects"]) || [];
 
     return data.map((d: any, index: number) => {
-      return <section key={index}>{d.name}</section>;
+      return (
+        <section key={index} className={style.sec}>
+          <h3>{d.name}</h3>
+          <p>{d.desc}</p>
+          <p>{d.proformance}</p>
+        </section>
+      );
     });
   }
+
+  const dialogContent = useMemo(() => {
+    if (resumeFillBlob) {
+      return (
+        <section
+          ref={resume}
+          className="overflow-hidden w-full h-full"
+        ></section>
+      );
+    } else {
+      return <Spin />;
+    }
+  }, [resumeFillBlob]);
 
   return (
     <article>
@@ -92,22 +113,15 @@ export default function ResumePage() {
         cancelText="取消"
         width="fit-content"
       >
-        {resumeFillBlob ? (
-          <section
-            ref={resume}
-            className="overflow-hidden w-full h-full"
-          ></section>
-        ) : (
-          <Spin />
-        )}
+        {dialogContent}
       </Modal>
       {getDescSec()}
       <FloatButton
-        icon={<i className="fa-solid fa-download"></i>}
+        icon={<UseSVG name="download" />}
         onClick={() => {
           setIsModalOpen((d) => !d);
         }}
-      />
+      ></FloatButton>
     </article>
   );
 }
