@@ -5,8 +5,8 @@ import Pizzip from "pizzip";
 import DocxTemplater from "docxtemplater";
 import { saveAs } from "file-saver";
 import { getJSON } from "./get";
-import style from "./page.module.css";
 import UseSVG from "../usesvg";
+import { getDescSec } from "./sections";
 
 function base64ToBytes(base64: string) {
   const binString = window.atob(base64);
@@ -19,6 +19,27 @@ function base64ToBytes(base64: string) {
 function fillResumeTemplate(arraybuffer: ArrayBuffer, json: any) {
   const zip = new Pizzip(arraybuffer);
   const doc = new DocxTemplater(zip, {
+    parser(tag) {
+      return {
+        get(scope) {
+          if (tag === ".") {
+            return scope;
+          }
+          if (/%.*%$/g.test(tag)) {
+            const value = scope[tag.replace(/%.*%$/g, "")];
+            if (Array.isArray(value)) {
+              const matched = /%(.*)%$/g.exec(tag);
+
+              return value.join((matched && matched[1]) || ",");
+            }
+          }
+          if (scope) {
+            return scope[tag];
+          }
+          return scope;
+        },
+      };
+    },
     nullGetter() {
       return "";
     },
@@ -32,7 +53,8 @@ function fillResumeTemplate(arraybuffer: ArrayBuffer, json: any) {
   return blob;
 }
 
-export default function ResumePage() {
+export default function ResumePage(props:any) {
+  console.log(props)
   const resume = useRef<HTMLElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [resumeFillBlob, setResumeFillBlob] = useState<null | Blob>(null);
@@ -75,19 +97,6 @@ export default function ResumePage() {
     if (!resumeFillBlob) return;
     saveAs(resumeFillBlob, "resume.docx");
   }
-  function getDescSec() {
-    const data = (resumeJSON && resumeJSON["projects"]) || [];
-
-    return data.map((d: any, index: number) => {
-      return (
-        <section key={index} className={style.sec}>
-          <h3>{d.name}</h3>
-          <p>{d.desc}</p>
-          <p>{d.proformance}</p>
-        </section>
-      );
-    });
-  }
 
   const dialogContent = useMemo(() => {
     if (resumeFillBlob) {
@@ -115,7 +124,7 @@ export default function ResumePage() {
       >
         {dialogContent}
       </Modal>
-      {getDescSec()}
+      {getDescSec(resumeJSON)}
       <FloatButton
         icon={<UseSVG name="download" />}
         onClick={() => {

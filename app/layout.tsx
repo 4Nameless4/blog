@@ -5,7 +5,6 @@ import Menu from "./menu";
 export const metadata: Metadata = {
   title: "MZW Blog",
   description: "Created by NextJS",
-  icons: "aa.svg",
 };
 
 export default function RootLayout({

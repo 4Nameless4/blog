@@ -27,3 +27,13 @@ body {
   border: 1px solid #fff;
   padding: 1rem;
 }
+
+main > * {
+  margin: 0 auto;
+}
+
+@media screen and (min-width: 1200px) {
+  main > * {
+    max-width: 1200px;
+  }
+}
