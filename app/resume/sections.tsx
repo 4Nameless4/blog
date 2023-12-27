@@ -7,7 +7,7 @@ export function getDescSec(resumeJSON: Record<string, any> | null) {
       <article key={index} className={style.sec}>
         <div className={style.title}>
           <h3>{d.name}</h3>
-          <span>[{d.duty}]</span>
+          <span>[{d.duty.join(' | ')}]</span>
           <span>
             {d.startTime}-{d.endTime}
           </span>
@@ -18,5 +18,10 @@ export function getDescSec(resumeJSON: Record<string, any> | null) {
       </article>
     );
   });
-  return <section>{_projects}</section>;
+  return (
+    <section>
+      <p>{(resumeJSON && resumeJSON["desc"]) || ""}</p>
+      {_projects}
+    </section>
+  );
 }

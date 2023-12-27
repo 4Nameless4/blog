@@ -53,8 +53,7 @@ function fillResumeTemplate(arraybuffer: ArrayBuffer, json: any) {
   return blob;
 }
 
-export default function ResumePage(props:any) {
-  console.log(props)
+export default function ResumePage() {
   const resume = useRef<HTMLElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [resumeFillBlob, setResumeFillBlob] = useState<null | Blob>(null);

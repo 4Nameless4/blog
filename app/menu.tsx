@@ -18,6 +18,12 @@ export default function Menu() {
         <Link href="/chatroom">
           <UseSVG name="comments" />
         </Link>
+        <Link href="/login">
+          <UseSVG name="user" />
+        </Link>
+        <Link href="https://github.com/4Nameless4">
+          <UseSVG name="github" />
+        </Link>
       </div>
     </div>
   );

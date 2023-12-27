@@ -1,0 +1,86 @@
+.textInput {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  position: relative;
+}
+.textInputContainer::after {
+  content: "";
+  position: relative;
+  width: 50%;
+  display: block;
+  will-change: width;
+  transition: width 0.2s linear;
+}
+.textInputContainer::after {
+  bottom: -3px;
+  border-bottom: 1px solid #9b9b9b;
+}
+.textInputContainer:focus-within::after {
+  width: 100%;
+}
+.card {
+  display: grid;
+  grid-template-columns: 3rem 1fr 2rem;
+  grid-template-rows: 1fr;
+}
+.tabs {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-rows: 1fr 1fr;
+  position: relative;
+}
+.tab {
+  text-align: center;
+  display: flex;
+  align-items: center;
+  border-radius: 5px;
+  background-color: rgb(185, 187, 189);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  z-index: 10;
+  transition: background-color 0.3s linear;
+  will-change: background-color;
+}
+.tab.active {
+  background-color: rgb(155, 205, 255);
+}
+.tab:hover {
+  background-color: rgb(155, 205, 255);
+  filter: brightness(1.5);
+}
+.tabCenter {
+  user-select: none;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background-color: #dfe8ff;
+  width: 3rem;
+  height: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 100;
+}
+.btnContainer button.btn {
+  width: 10rem;
+  height: 10rem;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transform: translate(35%, 35%);
+  border-radius: 50%;
+}
+.icon {
+  transform: translate(-100%, -100%);
+}
+.view {
+  width: 40rem;
+  height: 25rem;
+  gap: 4rem;
+}
