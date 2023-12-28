@@ -5,7 +5,7 @@ import Pizzip from "pizzip";
 import DocxTemplater from "docxtemplater";
 import { saveAs } from "file-saver";
 import { getJSON } from "./get";
-import UseSVG from "../usesvg";
+import UseSVG from "../../components/usesvg";
 import { getDescSec } from "./sections";
 
 function base64ToBytes(base64: string) {

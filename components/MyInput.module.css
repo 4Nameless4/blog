@@ -1,0 +1,60 @@
+.root {
+  display: flex;
+  width: 100%;
+  --success-color: #008bc3;
+  --error-color: red;
+  --warn-color: #faad14;
+}
+.textInput {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  position: relative;
+}
+.labelContainer {
+  flex-basis: 33%;
+  text-align: right;
+}
+.labelContainer > * {
+  margin-right: 1rem;
+}
+.inputContainer {
+  flex: 1;
+}
+.textInputContainer {
+  display: inline-block;
+}
+.textInputContainer::after {
+  content: "";
+  position: relative;
+  width: 80%;
+  display: block;
+  will-change: width;
+  transition: width 0.2s linear;
+  bottom: -3px;
+  border-bottom: 1px solid #9b9b9b;
+}
+.textInputContainer:focus-within::after {
+  width: 100%;
+}
+.root.error .textInputContainer::after {
+  border-color: var(--error-color);
+}
+.root.warn .textInputContainer::after {
+  border-color: var(--warn-color);
+}
+.root.success .textInputContainer::after {
+  border-color: var(--success-color);
+}
+.msg {
+  position: absolute;
+}
+.root.error .msg {
+  color: var(--error-color);
+}
+.root.warn .msg {
+  color: var(--warn-color);
+}
+.root.success .msg {
+  color: var(--success-color);
+}

@@ -1,4 +1,4 @@
-import UseSVG from "./usesvg";
+import UseSVG from "../components/usesvg";
 
 export default function Home() {
   return (
