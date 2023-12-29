@@ -1,0 +1,47 @@
+.card {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 2rem;
+  grid-template-rows: 1fr;
+}
+.tab {
+  position: absolute;
+  text-align: center;
+  text-wrap: nowrap;
+  border-radius: 10px;
+  cursor: pointer;
+  user-select: none;
+  z-index: 10;
+  transition: all 0.3s linear;
+  background-color: rgb(155, 205, 255);
+  left: 2rem;
+  padding: 0.4rem;
+  transform: translateX(0);
+  width: 3rem;
+  height: 1.25rem;
+}
+.tab:hover {
+  filter: brightness(1.2);
+  transform: translateX(0);
+}
+.active .tab {
+  left: calc(100% - 2rem);
+  transform: translateX(-100%);
+}
+.btnContainer button.btn {
+  width: 10rem;
+  height: 10rem;
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  transform: translate(35%, 35%);
+  border-radius: 50%;
+}
+.icon {
+  transform: translate(-100%, -100%);
+}
+.view {
+  width: 40rem;
+  height: 25rem;
+  gap: 4rem;
+}

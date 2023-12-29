@@ -1,7 +1,7 @@
 import { AES, enc, mode, pad } from "crypto-js";
 import { t_user } from "./user";
 
-export async function signin(user: t_user, pwd: string) {
+export async function signin(name: string, pwd: string) {
   const res = await fetch(process.env.SERVER + "/User/signin", {
     method: "POST",
     mode: "cors",
@@ -9,21 +9,21 @@ export async function signin(user: t_user, pwd: string) {
       Accept: "application/json",
       "Content-Type": "application/json;charset=utf-8",
     },
-    body: `"${aesEncode(JSON.stringify({ ...user, pwd }))}"`,
+    body: JSON.stringify(aesEncode(JSON.stringify({ name, pwd }))),
   });
   return res.json();
 }
-export async function check(user: t_user) {
+export async function check(token: string) {
   const res = await fetch(process.env.SERVER + "/user/check", {
     method: "POST",
-    body: aesEncode(JSON.stringify(user)),
+    body: JSON.stringify(aesEncode(token)),
   });
   return res.json();
 }
-export async function signup(user: t_user, pwd: string) {
+export async function signup(name: string, pwd: string, nickname: string) {
   const res = await fetch(process.env.SERVER + "/user/signup", {
     method: "POST",
-    body: aesEncode(JSON.stringify({ ...user, pwd })),
+    body: JSON.stringify(aesEncode(JSON.stringify({ name, nickname, pwd }))),
   });
   return res.json();
 }

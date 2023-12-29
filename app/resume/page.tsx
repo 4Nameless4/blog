@@ -7,6 +7,7 @@ import { saveAs } from "file-saver";
 import { getJSON } from "./get";
 import UseSVG from "../../components/usesvg";
 import { getDescSec } from "./sections";
+import style from "./page.module.css";
 
 function base64ToBytes(base64: string) {
   const binString = window.atob(base64);
@@ -111,7 +112,7 @@ export default function ResumePage() {
   }, [resumeFillBlob]);
 
   return (
-    <article>
+    <article className={style.resume}>
       <Modal
         title="预览"
         open={isModalOpen}

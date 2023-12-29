@@ -1,15 +1,14 @@
 "use client";
 import { Button } from "antd";
-import style from "./style.module.css";
-import { useEffect, useState } from "react";
+import style from "./page.module.css";
+import { useEffect, useMemo, useState } from "react";
 import { PoweroffOutlined } from "@ant-design/icons";
 import MyInput, {
   t_myinput_return_status,
   t_myinput_status,
 } from "../../components/MyInput";
 import { signin, signup } from "../../components/api";
-
-type t_active_type = "in" | "up";
+import UseSVG from "@/components/usesvg";
 
 function strCheck(size: [number, number], match: RegExp) {
   return (
@@ -43,12 +42,13 @@ const pwdCheck = strCheck([5, 16], /^[a-zA-Z][a-zA-Z0-9.#@*-+]+$/);
 const nicknameCheck = strCheck([5, 16], /^[a-zA-Z][a-zA-Z0-9]+$/);
 
 export default function LoginPage() {
-  const [active, setActive] = useState<t_active_type>("in");
+  const [active, setActive] = useState<boolean>(true);
   const [name, setName] = useState<string>("");
   const [pwd, setPwd] = useState<string>("");
   const [nickname, setNickname] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [check, setCheck] = useState(false);
+  const isSignUp = !active;
 
   function checkAll() {
     const n = nameCheck(name);
@@ -56,7 +56,7 @@ export default function LoginPage() {
     const nc = nicknameCheck(nickname);
     const checkArr = [n, p];
 
-    if (active === "up") {
+    if (!active) {
       checkArr.push(nc);
     }
     if (
@@ -78,10 +78,10 @@ export default function LoginPage() {
     setLoading(true);
     if (!check) return;
     if (active) {
-      const user = await signin({ name, nickname, token: "", uuid: "0" }, pwd);
+      const user = await signin(name, pwd);
       console.log(user);
     } else {
-      const msg = await signup({ name, nickname, token: "", uuid: "0" }, pwd);
+      const msg = await signup(name, nickname, pwd);
       console.log(msg);
     }
 
@@ -107,7 +107,6 @@ export default function LoginPage() {
   });
 
   function renderView() {
-    const require = active === "up";
     return (
       <div
         className={`flex justify-center items-center flex-col ${style.view}`}
@@ -116,10 +115,10 @@ export default function LoginPage() {
           value={name}
           label="User Name"
           placeholder="Entry User Name"
-          require={require}
+          require={isSignUp}
           onChange={(val) => {
             setName(val);
-            return (require && nameCheck(val)) || void 0;
+            return (isSignUp && nameCheck(val)) || void 0;
           }}
         />
 
@@ -128,22 +127,22 @@ export default function LoginPage() {
           label="Password"
           placeholder="Entry Password"
           type="password"
-          require={require}
+          require={isSignUp}
           onChange={(val) => {
             setPwd(val);
-            return (require && pwdCheck(val)) || void 0;
+            return (isSignUp && pwdCheck(val)) || void 0;
           }}
         />
 
-        {active === "up" ? (
+        {isSignUp ? (
           <MyInput
             value={nickname}
             label="Nickname"
             placeholder="Entry Nickname"
-            require={require}
+            require={isSignUp}
             onChange={(val) => {
               setNickname(val);
-              return (require && nicknameCheck(val)) || void 0;
+              return (isSignUp && nicknameCheck(val)) || void 0;
             }}
           />
         ) : null}
@@ -151,24 +150,20 @@ export default function LoginPage() {
     );
   }
   return (
-    <section className="w-full h-full flex justify-center items-center">
+    <section
+      className={`w-full h-full flex justify-center items-center ${
+        active ? style.active : ""
+      }`}
+    >
       <form
         className={`${style.card} backdrop-blur p-8 rounded shadow-lg rounded-xl overflow-hidden`}
       >
-        <div className={style.tabs}>
-          <div
-            className={`${style.tab} ${active === "in" ? style.active : ""}`}
-            onClick={() => setActive("in")}
-          >
-            In
-          </div>
-          <div className={style.tabCenter}>Sign</div>
-          <div
-            className={`${style.tab} ${active === "up" ? style.active : ""}`}
-            onClick={() => setActive("up")}
-          >
-            Up
-          </div>
+        <div
+          className={style.tab}
+          onClick={() => setActive(!active)}
+          title={active ? "Sign Up" : "Sign In"}
+        >
+          <UseSVG name={active ? "signup" : "signin"} />
         </div>
         {renderView()}
         <div className={style.btnContainer}>

@@ -17,7 +17,14 @@
   justify-content: space-between;
   font-weight: 700;
 }
+.childTitle {
+  font-weight: 500;
+}
 
 .structure {
   font-style: italic;
+}
+
+.p {
+  text-indent: 2rem;
 }

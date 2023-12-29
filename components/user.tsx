@@ -6,7 +6,9 @@ export type t_user = {
   uuid: string;
   name: string;
   nickname: string;
-  token: string;
+  pwd?: string;
+  token?: string;
+  role: string; // admin user
 };
 
 export function User() {
