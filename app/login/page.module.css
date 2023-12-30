@@ -1,8 +1,10 @@
 .card {
-  position: relative;
   display: grid;
   grid-template-columns: 1fr 2rem;
   grid-template-rows: 1fr;
+  background-image: url(/preview.gif);
+  background-repeat: no-repeat;
+  background-size: cover;
 }
 .tab {
   position: absolute;
@@ -44,4 +46,62 @@
   width: 40rem;
   height: 25rem;
   gap: 4rem;
+}
+.message {
+  margin-top: 1rem;
+}
+.userIcon {
+  position: relative;
+  color: aliceblue;
+  background-color: black;
+  display: block;
+  width: 5rem;
+  height: 5rem;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-transform: uppercase;
+  user-select: none;
+  margin: 0 auto;
+}
+.userIcon::after {
+  position: absolute;
+  content: "";
+  inset: -0.25rem;
+  z-index: -1;
+  /* background-color: hsl(224, 44%, 42%); */
+  background-image: conic-gradient(
+    hsl(224, 90%, 66%) 80deg,
+    transparent 80deg
+  );
+  border-radius: 50%;
+  animation: rotate 4s linear alternate infinite;
+}
+.userIcon::before {
+  position: absolute;
+  content: "";
+  inset: -0.25rem;
+  z-index: -1;
+  /* background-color: hsl(224, 44%, 42%); */
+  background-image: conic-gradient(
+    transparent 180deg,
+    hsl(224, 90%, 66%) 180deg 260deg,
+    transparent 260deg
+  );
+  border-radius: 50%;
+  animation: rotate 4s linear alternate infinite;
+}
+.userInfo {
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  line-height: 1.5rem;
+  margin-top: 1rem;
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(1turn);
+  }
 }

@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { t_user, createTempUser } from "../../components/user";
+import { t_user } from "../../common/user";
 
 interface t_msg {
   time: number;
@@ -41,7 +41,7 @@ export default function ChatRoomPage() {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
-    setMe(createTempUser());
+    // setMe(createTempUser());
 
     // const ws = new WebSocket("ws://localhost:6060");
     // ws.addEventListener("message", (event) => {

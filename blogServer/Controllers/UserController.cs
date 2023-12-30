@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System;
 using System.Buffers.Text;
+using System.Collections.Generic;
 using System.Reflection.Emit;
 using System.Security.Cryptography;
 using System.Text;
@@ -114,8 +115,7 @@ namespace blogServer.Controllers
                 if (
                     arr[i].name == user.name && 
                     arr[i].uuid == user.uuid && 
-                    arr[i].nickname == user.nickname && 
-                    arr[i].pwd == user.pwd
+                    arr[i].nickname == user.nickname
                     )
                 {
                     return true;
@@ -165,9 +165,9 @@ namespace blogServer.Controllers
             return res;
         }
         [HttpPost("check")]
-        public Result<bool> Check([FromBody]string base64)
+        public Result<IDictionary<string, string>> Check([FromBody]string base64)
         {
-            Result<bool> res = new Result<bool>() { code = "0", data = false, msg = "" };
+            Result<IDictionary<string, string>> res = new Result<IDictionary<string, string>>() { code = "0", data = new Dictionary<string, string>(), msg = "" };
             try
             {
                 var users = getUsers();
@@ -180,7 +180,11 @@ namespace blogServer.Controllers
                 if (r != "error" && flag)
                 {
                     res.code = "1";
-                    res.data = true;
+                    res.data.Add("token", token);
+                    res.data.Add("name", user.name);
+                    res.data.Add("nickname", user.nickname);
+                    res.data.Add("role", user.role);
+                    res.data.Add("uuid", user.uuid.ToString());
                     return res;
                 }
                 else if (flag)
@@ -200,9 +204,9 @@ namespace blogServer.Controllers
             return res;
         }
         [HttpPost("signin")]
-        public Result<string> Signin([FromBody] string base64)
+        public Result<IDictionary<string, string>> Signin([FromBody] string base64)
         {
-            Result<string> res = new Result<string>() { code = "0", data = "", msg = "" };
+            Result<IDictionary<string, string>> res = new Result<IDictionary<string, string>>() { code = "0", data = new Dictionary<string, string>(), msg = "" };
 
             try
             {
@@ -212,16 +216,23 @@ namespace blogServer.Controllers
                 User user = findUser2(us, data_user.name);
                 if (user.name == data_user.name && user.pwd == data_user.pwd)
                 {
-                    // model类 转 string(json)
-                    var objstr = JsonConvert.SerializeObject(user);
-                    //string(json) 转 Dictionary
-                    var dict = JsonConvert.DeserializeObject<Dictionary<string, object>>(objstr);
-                    var token = TokenHelper.CreateJwtToken(dict);
+                    var userStore = new Dictionary<string, object>() { { "name", user.name }, { "nickname", user.nickname }, { "role", user.role }, { "uuid", user.uuid.ToString() } };
+                    var token = TokenHelper.CreateJwtToken(userStore);
                     res.code = "1";
-                    res.data = token;
+                    res.data.Add("token", token);
+                    res.data.Add("name", user.name);
+                    res.data.Add("nickname", user.nickname);
+                    res.data.Add("role", user.role);
+                    res.data.Add("uuid", user.uuid.ToString());
                 }
+                else if (user.name != data_user.name)
+                {
+                    res.code = "2";
+                    res.msg = "user not found";
+                } 
                 else
                 {
+                    res.code = "3";
                     res.msg = "user name or password error";
                 }
             }

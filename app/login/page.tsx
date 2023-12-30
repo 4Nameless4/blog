@@ -7,8 +7,10 @@ import MyInput, {
   t_myinput_return_status,
   t_myinput_status,
 } from "../../components/MyInput";
-import { signin, signup } from "../../components/api";
+import { signin, signup } from "../../common/api";
 import UseSVG from "@/components/usesvg";
+import { getUser, setLocalUser } from "@/common/user";
+import { t_user } from "@/common/types";
 
 function strCheck(size: [number, number], match: RegExp) {
   return (
@@ -42,13 +44,14 @@ const pwdCheck = strCheck([5, 16], /^[a-zA-Z][a-zA-Z0-9.#@*-+]+$/);
 const nicknameCheck = strCheck([5, 16], /^[a-zA-Z][a-zA-Z0-9]+$/);
 
 export default function LoginPage() {
+  const [msg, setMsg] = useState("");
+  const [user, setUser] = useState<null | t_user>(null);
   const [active, setActive] = useState<boolean>(true);
   const [name, setName] = useState<string>("");
   const [pwd, setPwd] = useState<string>("");
   const [nickname, setNickname] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [check, setCheck] = useState(false);
-  const isSignUp = !active;
 
   function checkAll() {
     const n = nameCheck(name);
@@ -75,16 +78,33 @@ export default function LoginPage() {
   }
 
   async function click() {
+    let result = "";
     setLoading(true);
     if (!check) return;
     if (active) {
       const user = await signin(name, pwd);
       console.log(user);
+      if (user) {
+        setUser(user);
+        setLocalUser(user);
+      } else {
+        result = "用户名或密码错误";
+      }
     } else {
       const msg = await signup(name, nickname, pwd);
       console.log(msg);
+      if (msg) {
+        const user = await signin(name, pwd);
+        if (user) {
+          setUser(user);
+        } else {
+          result = "注册登陆失败";
+        }
+      } else {
+        result = "已存在用户名";
+      }
     }
-
+    setMsg(result);
     setTimeout(() => setLoading(false), 300);
   }
 
@@ -105,12 +125,33 @@ export default function LoginPage() {
       signalController.abort();
     };
   });
+  useEffect(() => {
+    getUser().then((d) => {
+      if (d) {
+        setUser(d);
+      }
+    });
+  }, []);
 
-  function renderView() {
+  function renderInfo() {
+    if (!user) return null;
     return (
-      <div
-        className={`flex justify-center items-center flex-col ${style.view}`}
-      >
+      <div>
+        <span className={style.userIcon} title={user.nickname}>
+          {user.nickname.split("")[0]}
+        </span>
+        <div className={style.userInfo}>
+          <span className={style.userUUID}>UUID: {user.uuid}</span>
+          <span className={style.userName}>Account: {user.name}</span>
+          <span className={style.userRole}>Level: {user.role}</span>
+        </div>
+      </div>
+    );
+  }
+
+  function renderSign(isSignUp: boolean) {
+    return (
+      <>
         <MyInput
           value={name}
           label="User Name"
@@ -146,12 +187,41 @@ export default function LoginPage() {
             }}
           />
         ) : null}
+      </>
+    );
+  }
+
+  function renderView() {
+    return (
+      <div
+        className={`flex justify-center items-center flex-col ${style.view}`}
+      >
+        {user && active ? renderInfo() : renderSign(!active)}
+      </div>
+    );
+  }
+  function renderBtn() {
+    if (user && active) return null;
+    return (
+      <div className={style.btnContainer}>
+        <Button
+          type="primary"
+          disabled={!check}
+          icon={
+            <div className={style.icon}>
+              <PoweroffOutlined />
+            </div>
+          }
+          onClick={click}
+          loading={loading}
+          className={style.btn}
+        />
       </div>
     );
   }
   return (
     <section
-      className={`w-full h-full flex justify-center items-center ${
+      className={`w-full h-full flex justify-center items-center flex-col ${
         active ? style.active : ""
       }`}
     >
@@ -166,21 +236,11 @@ export default function LoginPage() {
           <UseSVG name={active ? "signup" : "signin"} />
         </div>
         {renderView()}
-        <div className={style.btnContainer}>
-          <Button
-            type="primary"
-            disabled={!check}
-            icon={
-              <div className={style.icon}>
-                <PoweroffOutlined />
-              </div>
-            }
-            onClick={click}
-            loading={loading}
-            className={style.btn}
-          />
-        </div>
+        {renderBtn()}
       </form>
+      <div className={style.message}>
+        <span>{msg}</span>
+      </div>
     </section>
   );
 }
