@@ -4,10 +4,11 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import Pizzip from "pizzip";
 import DocxTemplater from "docxtemplater";
 import { saveAs } from "file-saver";
-import { getJSON } from "./get";
 import UseSVG from "../../components/usesvg";
 import { getDescSec } from "./sections";
 import style from "./page.module.css";
+import { getUser } from "@/common/user";
+import { redirect, useRouter } from "next/navigation";
 
 function base64ToBytes(base64: string) {
   const binString = window.atob(base64);
@@ -54,7 +55,13 @@ function fillResumeTemplate(arraybuffer: ArrayBuffer, json: any) {
   return blob;
 }
 
+function renderNotAllowPage() {
+  return <div className="flex justif-center items-center">Not Allow</div>;
+}
+
 export default function ResumePage() {
+  const router = useRouter();
+  const [allow, setAllow] = useState(false);
   const resume = useRef<HTMLElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [resumeFillBlob, setResumeFillBlob] = useState<null | Blob>(null);
@@ -63,9 +70,21 @@ export default function ResumePage() {
   );
 
   useEffect(() => {
+    getUser().then((d) => {
+      if (!d || d.role !== "admin") {
+        redirect("/login");
+      } else {
+        setAllow(true);
+      }
+    });
+  });
+  useEffect(() => {
+    if (!allow) return;
     Promise.all([
-      getJSON(),
-      fetch("/resumeTemplate.docx").then((r) => r.blob()),
+      fetch(process.env.StaticSERVER + "/resumeinfo").then((r) => r.text()),
+      fetch(process.env.StaticSERVER + "/resumeTemplate.docx").then((r) =>
+        r.blob()
+      ),
     ]).then(([json, blob]) => {
       if (!blob) return;
       let jsonObj = {};
@@ -79,8 +98,9 @@ export default function ResumePage() {
         setResumeFillBlob(fillBlob);
       });
     });
-  }, []);
+  }, [allow]);
   useEffect(() => {
+    if (!allow) return;
     try {
       const el = resume.current;
       if (!isModalOpen || !el || !resumeFillBlob) return;
@@ -91,13 +111,11 @@ export default function ResumePage() {
     } catch (e) {
       console.error(e);
     }
-  }, [isModalOpen, resumeFillBlob]);
-
+  }, [isModalOpen, resumeFillBlob, allow]);
   function _download() {
-    if (!resumeFillBlob) return;
+    if (!resumeFillBlob || !allow) return;
     saveAs(resumeFillBlob, "resume.docx");
   }
-
   const dialogContent = useMemo(() => {
     if (resumeFillBlob) {
       return (
@@ -110,27 +128,29 @@ export default function ResumePage() {
       return <Spin />;
     }
   }, [resumeFillBlob]);
-
-  return (
-    <article className={style.resume}>
-      <Modal
-        title="预览"
-        open={isModalOpen}
-        onOk={_download}
-        okText="下载"
-        onCancel={() => setIsModalOpen(false)}
-        cancelText="取消"
-        width="fit-content"
-      >
-        {dialogContent}
-      </Modal>
-      {getDescSec(resumeJSON)}
-      <FloatButton
-        icon={<UseSVG name="download" />}
-        onClick={() => {
-          setIsModalOpen((d) => !d);
-        }}
-      ></FloatButton>
-    </article>
-  );
+  function renderPage() {
+    return (
+      <article className={style.resume}>
+        <Modal
+          title="预览"
+          open={isModalOpen}
+          onOk={_download}
+          okText="下载"
+          onCancel={() => setIsModalOpen(false)}
+          cancelText="取消"
+          width="fit-content"
+        >
+          {dialogContent}
+        </Modal>
+        {getDescSec(resumeJSON)}
+        <FloatButton
+          icon={<UseSVG name="download" />}
+          onClick={() => {
+            setIsModalOpen((d) => !d);
+          }}
+        ></FloatButton>
+      </article>
+    );
+  }
+  return allow ? renderPage() : renderNotAllowPage();
 }

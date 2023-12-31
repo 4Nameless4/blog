@@ -1,15 +1,15 @@
 "use client";
 import { Button } from "antd";
 import style from "./page.module.css";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { PoweroffOutlined } from "@ant-design/icons";
 import MyInput, {
   t_myinput_return_status,
   t_myinput_status,
-} from "../../components/MyInput";
-import { signin, signup } from "../../common/api";
+} from "@/components/MyInput";
+import { signin, signup } from "@/common/api";
 import UseSVG from "@/components/usesvg";
-import { getUser, setLocalUser } from "@/common/user";
+import { clearLocalUser, getUser, setLocalUser } from "@/common/user";
 import { t_user } from "@/common/types";
 
 function strCheck(size: [number, number], match: RegExp) {
@@ -77,33 +77,43 @@ export default function LoginPage() {
     }
   }
 
+  async function login(err: string) {
+    let result = "";
+    const user = await signin(name, pwd);
+    if (user) {
+      setUser(user);
+      setLocalUser(user);
+      setActive(true);
+    } else {
+      result = err;
+    }
+    return result;
+  }
+
+  async function clearInput(type: "all" | "password" = "all") {
+    if (type === "all") {
+      setName("");
+      setNickname("");
+    }
+    setPwd("");
+  }
+
   async function click() {
     let result = "";
     setLoading(true);
     if (!check) return;
     if (active) {
-      const user = await signin(name, pwd);
-      console.log(user);
-      if (user) {
-        setUser(user);
-        setLocalUser(user);
-      } else {
-        result = "用户名或密码错误";
-      }
+      result = await login("用户名或密码错误");
     } else {
       const msg = await signup(name, nickname, pwd);
-      console.log(msg);
       if (msg) {
-        const user = await signin(name, pwd);
-        if (user) {
-          setUser(user);
-        } else {
-          result = "注册登陆失败";
-        }
+        result = await login("注册登陆失败");
       } else {
         result = "已存在用户名";
       }
     }
+    clearInput(!result ? "all" : "password");
+
     setMsg(result);
     setTimeout(() => setLoading(false), 300);
   }
@@ -136,16 +146,29 @@ export default function LoginPage() {
   function renderInfo() {
     if (!user) return null;
     return (
-      <div>
-        <span className={style.userIcon} title={user.nickname}>
-          {user.nickname.split("")[0]}
-        </span>
-        <div className={style.userInfo}>
-          <span className={style.userUUID}>UUID: {user.uuid}</span>
-          <span className={style.userName}>Account: {user.name}</span>
-          <span className={style.userRole}>Level: {user.role}</span>
+      <>
+        <div>
+          <span className={style.userIcon} title={user.nickname}>
+            {user.nickname.split("")[0]}
+          </span>
+          <div className={style.userInfo}>
+            <span className={style.userUUID}>UUID: {user.uuid}</span>
+            <span className={style.userName}>Account: {user.name}</span>
+            <span className={style.userRole}>Level: {user.role}</span>
+          </div>
         </div>
-      </div>
+
+        <Button
+          title="Logout"
+          type="primary"
+          icon={<PoweroffOutlined />}
+          onClick={() => {
+            clearLocalUser();
+            setUser(null);
+          }}
+          className={style["logout-btn"]}
+        />
+      </>
     );
   }
 

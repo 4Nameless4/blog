@@ -2,9 +2,6 @@
   display: grid;
   grid-template-columns: 1fr 2rem;
   grid-template-rows: 1fr;
-  background-image: url(/preview.gif);
-  background-repeat: no-repeat;
-  background-size: cover;
 }
 .tab {
   position: absolute;
@@ -76,7 +73,7 @@
     transparent 80deg
   );
   border-radius: 50%;
-  animation: rotate 4s linear alternate infinite;
+  animation: rotate 5s ease-in alternate infinite;
 }
 .userIcon::before {
   position: absolute;
@@ -90,7 +87,7 @@
     transparent 260deg
   );
   border-radius: 50%;
-  animation: rotate 4s linear alternate infinite;
+  animation: rotate 3s ease-out alternate infinite;
 }
 .userInfo {
   display: flex;
@@ -104,4 +101,11 @@
   100% {
     transform: rotate(1turn);
   }
+}
+
+.view .logout-btn {
+  border-radius: 50%;
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto;
 }

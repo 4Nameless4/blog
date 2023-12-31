@@ -1,24 +1,19 @@
 "use client";
-import { Avatar } from "antd";
-import Link from "next/link";
 import { t_user } from "./types";
 import { checkUser } from "./api";
 import { aesEncode2base64, base642aesDecode } from "./utils";
-
-export function User() {
-  return (
-    <Link href="/login">
-      <Avatar size={64} icon={<i className="fa-regular fa-user icon"></i>} />
-    </Link>
-  );
-}
 
 export function getLocalUser(): t_user | null {
   const userStr = sessionStorage.getItem("user");
   if (!userStr) {
     return null;
   }
-  return JSON.parse(base642aesDecode(userStr));
+  try {
+    const origin = base642aesDecode(userStr);
+    return JSON.parse(origin);
+  } catch {
+    return null;
+  }
 }
 export function setLocalUser(user: t_user) {
   const userBase = aesEncode2base64(JSON.stringify(user));
@@ -36,6 +31,8 @@ export async function getUser(): Promise<t_user | false> {
   }
   if (!info) {
     clearLocalUser();
+  } else {
+    setLocalUser(info);
   }
   return info;
 }

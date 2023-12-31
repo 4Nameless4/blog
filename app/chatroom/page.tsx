@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { t_user } from "../../common/user";
+import { t_user } from "@/common/types";
 
 interface t_msg {
   time: number;

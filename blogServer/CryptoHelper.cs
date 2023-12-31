@@ -6,7 +6,7 @@ namespace blogServer
 {
     public class CryptoHelper
     {
-        private static byte[] keyBytes = Encoding.UTF8.GetBytes("|a2we##q2/d-e1=2");
+        private static byte[] keyBytes = Encoding.UTF8.GetBytes("a2hk3we*4/9d+a5-");
         private static byte[] ivBytes = Encoding.UTF8.GetBytes("089dg|1*h19a//a*");
         static byte[] EncryptStringToBytes_Aes(string plainText, byte[] Key, byte[] IV)
         {

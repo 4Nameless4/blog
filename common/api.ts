@@ -1,3 +1,4 @@
+"use server";
 import { t_user } from "./types";
 import { aesEncode2base64 } from "./utils";
 
