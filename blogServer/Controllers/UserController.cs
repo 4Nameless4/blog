@@ -1,13 +1,20 @@
-﻿using blogServer.Models;
+﻿using blogServer.Common;
+using blogServer.DataContext;
+using blogServer.Models;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
+using MySql.Data.MySqlClient;
 using Newtonsoft.Json;
+using Org.BouncyCastle.Utilities.Encoders;
 using System;
 using System.Buffers.Text;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Reflection.Emit;
 using System.Security.Cryptography;
 using System.Text;
@@ -19,96 +26,66 @@ namespace blogServer.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        public static long uuids = 0;
-        public static User[] users = [];
-        public static bool isRead = false;
-        public static string[] tokens = [];
-        [NonAction]
-        public User[] getUsers() 
+        private static string selectUserSql = "select t1.uuid,t1.name,t1.nickname,t1.pwd,t1.email,t1.create_time,t1.role from user as t1";
+        private static string insertUserSql = "INSERT INTO `blog`.`user` (`id`, `uuid`, `name`, `pwd`, `role`, `nickname`) VALUES ('3', '4', 'asdfg', 'asdfg', '2', 'asdfg');";
+        private static string selectRoleSql = "select * from permissions as t1";
+        public static List<string> tokens = [];
+        private readonly BlogContext blogContext;
+        public UserController(BlogContext context)
         {
-            if (isRead)
-            {
-                return users;
-            }
-            string str = "";
-            using (FileStream fs = new FileStream("user.dat", FileMode.OpenOrCreate, FileAccess.Read))
-            {
-              byte[] bts = new byte[fs.Length];
-              fs.Read(bts, 0, bts.Length);
-              UTF8Encoding encod = new UTF8Encoding();
-              str = encod.GetString(bts);
-              var usersStr = str.Replace("\n","").Replace("\r","").Split(";");
-              foreach (var item in usersStr)
-              {
-                  if (item.Length > 4)
-                  {
-                      try
-                      {
-                          var keyvalues = item.Split(",");
-                          var uuid = long.Parse(keyvalues[0]);
-                          var name = keyvalues[1];
-                          var pwd = keyvalues[2];
-                          var nick = keyvalues[3];
-                          var role = keyvalues[4];
-                          var list = users.ToList();
-                          list.Add(new User { uuid = uuid, name = name, nickname = nick, pwd = pwd, role = role });
-                          users = list.ToArray();
-                          if (uuid > uuids)
-                          {
-                              uuids = uuid;
-                          }
-                      }
-                      catch {
-                          continue;
-                      }
-                  }
-              }
-            };
-            isRead = true;
-            return users;
-        }
-        [NonAction]
-        public void setUser(string name, string nick, string pwd, string role)
-        {
-            var uuid = ++uuids;
-            using (FileStream fs = new FileStream("user.dat", FileMode.OpenOrCreate, FileAccess.Write))
-            {
-                byte[] ub = new UTF8Encoding().GetBytes(uuid + "," + name + "," + pwd + "," + nick + "," + role + ";");
-                fs.Position = fs.Length;
-                fs.Write(ub, 0, ub.Length);
-                fs.Flush();
-            };
-            var list = users.ToList();
-            list.Add(new Models.User() { uuid = uuid, name = name, nickname = nick, pwd = pwd, role = role });
-            users = list.ToArray();
-        }
-        [NonAction]
-        public User findUserByName(User[] arr, User user)
-        {
-            for (int i = 0; i < arr.Length; i++)
-            {
-                var iuser = arr[i];
-                if (iuser.name == user.name)
-                {
-                    return arr[i];
-                }
-            }
-            return new Models.User() { uuid = -1 };
+            blogContext = context;
         }
         [NonAction]
         public User parseBase64ToUser(string base64)
         {
             try
             {
-
                 var str = CryptoHelper.decode(base64);
-                var _user = JsonConvert.DeserializeObject<User>(str);
+                var _user = JsonConvert.DeserializeObject<User>(str) ?? new Models.User();
                 return _user;
-            } catch {
+            }
+            catch
+            {
                 User user = new User();
                 return user;
             }
         }
+        //[NonAction]
+        //private User getUserFromDataBase(MySqlDataReader reader)
+        //{
+        //    User user = new User();
+
+        //    if (reader.Read())
+        //    {
+        //        user.uuid = DBHelper.GetValueByColName<long>(reader, "uuid", -1);
+        //        user.name = DBHelper.GetValueByColName(reader, "name", "");
+        //        user.nickname = DBHelper.GetValueByColName(reader, "nickname", "");
+        //        user.pwd = DBHelper.GetValueByColName(reader, "pwd", "");
+        //        user.email = DBHelper.GetValueByColName(reader, "email", "");
+        //        user.createTime = DBHelper.GetValueByColName(reader, "create_time", new DateTime(2000, 1, 1, 00, 00, 00));
+        //        user.role = DBHelper.GetValueByColName(reader, "role", 3);
+        //    }
+        //    return user;
+        //}
+        //[NonAction]
+        //private User getUserByName(string name)
+        //{
+        //    User user = new User() { uuid = -1 };
+        //    try
+        //    {
+        //        using (MySqlConnection con = new MySqlConnection(AppConfiguration.Configuration.GetConnectionString("DefaultConnection")))
+        //        {
+        //            con.Open();
+        //            MySqlCommand comd = new MySqlCommand($"{selectUserSql} where t1.name = \"{name}\"", con);
+        //            var reader = comd.ExecuteReader();
+        //            var datauser = getUserFromDataBase(reader);
+        //            return datauser;
+        //        }
+        //    }
+        //    catch { }
+        //    return user;
+        //}
+        // parameter base64: {name:string;pwd:string;nickname:string}
         [HttpPost("signup")]
         public Result<bool> Signup([FromBody] string base64)
         {
@@ -116,18 +93,22 @@ namespace blogServer.Controllers
             try
             {
                 var data_user = parseBase64ToUser(base64);
-                User[] us = getUsers();
-                User isFind = findUserByName(us, data_user);
-                if (isFind.uuid != -1)
+                if (data_user != null)
                 {
-                    res.msg = "user exist";
-                    return res;
-                }
-                else
-                {
-                    setUser(data_user.name, data_user.nickname, data_user.pwd, "user");
-                    res.code = "1";
-                    res.data = true;
+                    // User user = getUserByName(data_user.name ?? "");
+                    var _user = blogContext.users.SingleOrDefault((b) => b.name == data_user.name);
+                    if (_user != null)
+                    {
+                        res.msg = "user exist";
+                        return res;
+                    }
+                    else
+                    {
+                        blogContext.users.Add(new Models.User() { name = data_user.name, pwd = data_user.pwd, nickname = data_user.nickname });
+                        blogContext.SaveChanges();
+                        res.code = "1";
+                        res.data = true;
+                    }
                 }
             }
             catch (Exception ex)
@@ -136,37 +117,31 @@ namespace blogServer.Controllers
             }
             return res;
         }
+        // parameter base64: token string
         [HttpPost("check")]
-        public Result<IDictionary<string, string>> Check([FromBody]string base64)
+        public Result<User> Check([FromBody] string base64)
         {
-            Result<IDictionary<string, string>> res = new Result<IDictionary<string, string>>() { code = "0", data = new Dictionary<string, string>(), msg = "" };
+            Result<User> res = new Result<User>() { code = "0", data = new User(), msg = "" };
             try
             {
-                var users = getUsers();
-
                 var token = CryptoHelper.decode(base64);
                 var r = TokenHelper.ValidateJwtToken(token);
-
-                User user = JsonConvert.DeserializeObject<User>(r);
-                var _user = findUserByName(users, user);
-                bool flag = _user.uuid != -1;
-                if (r != "error" && flag)
+                if (r != null)
                 {
-                    res.code = "1";
-                    res.data.Add("token", token);
-                    res.data.Add("name", _user.name);
-                    res.data.Add("nickname", _user.nickname);
-                    res.data.Add("role", _user.role);
-                    res.data.Add("uuid", _user.uuid.ToString());
-                    return res;
-                }
-                else if (flag)
-                {
-                    res.msg = "token error";
-                }
-                else
-                {
-                    res.msg = "user not found";
+                    User tokenUser = JsonConvert.DeserializeObject<User>(r) ?? new Models.User();
+                    var dataUser = blogContext.users.Single((b) => b.name == tokenUser.name && b.uuid == tokenUser.uuid && b.role == tokenUser.role);
+                    var flag = tokens.Contains(token);
+                    if (dataUser != null && flag)
+                    {
+                        res.code = "1";
+                        dataUser.pwd = "";
+                        res.data = dataUser;
+                        return res;
+                    }
+                    else
+                    {
+                        res.msg = "user not found";
+                    }
                 }
             }
             catch (Exception ex)
@@ -176,40 +151,33 @@ namespace blogServer.Controllers
 
             return res;
         }
+        // parameter base64: {name:string;pwd:string}
         [HttpPost("signin")]
-        public Result<IDictionary<string, string>> Signin([FromBody] string base64)
+        public Result<IDictionary<string, object>> Signin([FromBody] string base64)
         {
-            Result<IDictionary<string, string>> res = new Result<IDictionary<string, string>>() { code = "0", data = new Dictionary<string, string>(), msg = "" };
+            Result<IDictionary<string, object>> res = new Result<IDictionary<string, object>>() { code = "0", data = new Dictionary<string, object>(), msg = "" };
 
             try
             {
                 var data_user = parseBase64ToUser(base64);
-                User[] us = getUsers();
 
-                User user = findUserByName(us, data_user);
-                if (user.name == data_user.name && user.pwd == data_user.pwd)
+                var _user = blogContext.users.Single((b) => b.name == data_user.name && b.pwd == data_user.pwd);
+                if (_user != null)
                 {
-                    var userStore = new Dictionary<string, object>() { { "name", user.name }, { "nickname", user.nickname }, { "role", user.role }, { "uuid", user.uuid.ToString() } };
+                    var userStore = new Dictionary<string, object>() { { "name", _user.name }, { "nickname", _user.nickname }, { "role", _user.role }, { "uuid", _user.uuid.ToString() } };
                     var token = TokenHelper.CreateJwtToken(userStore);
                     res.code = "1";
-                    res.data.Add("token", token);
-                    res.data.Add("name", user.name);
-                    res.data.Add("nickname", user.nickname);
-                    res.data.Add("role", user.role);
-                    res.data.Add("uuid", user.uuid.ToString());
+                    _user.pwd = "";
+                    res.data = new Dictionary<string, object>() { { "token", token }, { "uuid", _user.uuid }, { "name", _user.name }, { "nickname", _user.nickname }, { "email", _user.email ?? "" }, { "role", _user.role }, { "createTime", _user.createTime ?? new DateTime(2000,1,1,0,0,0) } };
+                    tokens.Add(token);
                 }
-                else if (user.name != data_user.name)
-                {
-                    res.code = "2";
-                    res.msg = "user not found";
-                } 
                 else
                 {
                     res.code = "3";
                     res.msg = "user name or password error";
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 res.msg = ex.Message;
             }

@@ -3,14 +3,21 @@ using JWT.Algorithms;
 using JWT.Builder;
 using JWT.Exceptions;
 using JWT.Serializers;
+using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Org.BouncyCastle.Utilities;
 using System.Security.Claims;
+using System.Text;
 
-namespace blogServer
+namespace blogServer.Common
 {
     public class TokenHelper
     {
-        public static string secret = "$zas|wd%m";
-        public static string CreateJwtToken(IDictionary<string,object> claims)
+        static string secret;
+        static TokenHelper()
+        {
+            secret = AppConfiguration.Configuration.GetValue<string>("token:secret") ?? "$zas|wd%m";
+        }
+        public static string CreateJwtToken(IDictionary<string, object> claims)
         {
             var builder = JwtBuilder.Create()
                       .WithAlgorithm(new HMACSHA256Algorithm())

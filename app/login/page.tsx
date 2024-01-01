@@ -82,7 +82,7 @@ export default function LoginPage() {
     const user = await signin(name, pwd);
     if (user) {
       setUser(user);
-      setLocalUser(user);
+      setLocalUser(user, user.token);
       setActive(true);
     } else {
       result = err;

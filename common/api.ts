@@ -1,4 +1,3 @@
-"use server";
 import { t_user } from "./types";
 import { aesEncode2base64 } from "./utils";
 
@@ -26,8 +25,8 @@ export async function signin(name: string, pwd: string) {
     "/User/signin",
     aesEncode2base64(JSON.stringify({ name, pwd }))
   );
-  let info: false | t_user = false;
-  const result: t_result<t_user> = await res.json();
+  let info: false | (t_user & { token: string }) = false;
+  const result: t_result<t_user & { token: string }> = await res.json();
   if (result.code === "1") {
     info = result.data;
   }

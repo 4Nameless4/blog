@@ -1,7 +1,12 @@
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+using blogServer.Common;
+using blogServer.DataContext;
+using Microsoft.EntityFrameworkCore;
+
+var appConfig = AppConfiguration.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(name: MyAllowSpecificOrigins,
@@ -13,11 +18,13 @@ builder.Services.AddCors(options =>
 });
 
 // Add services to the container.
-
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+string connectStr = appConfig.GetConnectionString("DefaultConnection") ?? "";
+builder.Services.AddDbContext<BlogContext>(oprions => oprions.UseMySql(connectStr, new MySqlServerVersion(new Version(8, 0, 35))));
 
 var app = builder.Build();
 

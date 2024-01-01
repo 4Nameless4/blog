@@ -1,13 +1,23 @@
-﻿using System.Security.Cryptography;
+﻿using System.Configuration;
+using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Linq;
 
-namespace blogServer
+namespace blogServer.Common
 {
     public class CryptoHelper
     {
-        private static byte[] keyBytes = Encoding.UTF8.GetBytes("a2hk3we*4/9d+a5-");
-        private static byte[] ivBytes = Encoding.UTF8.GetBytes("089dg|1*h19a//a*");
+        static string key;
+        static byte[] keyBytes;
+        static string iv;
+        static byte[] ivBytes;
+        static CryptoHelper()
+        {
+            key = AppConfiguration.Configuration.GetValue<string>("api:key") ?? "a2hk3we*4/9d+a5-";
+            iv = AppConfiguration.Configuration.GetValue<string>("api:iv") ?? "089dg|1*h19a//a*";
+            keyBytes = Encoding.UTF8.GetBytes(key);
+            ivBytes = Encoding.UTF8.GetBytes(iv);
+        }
         static byte[] EncryptStringToBytes_Aes(string plainText, byte[] Key, byte[] IV)
         {
             // Check arguments.
@@ -59,7 +69,7 @@ namespace blogServer
 
             // Declare the string used to hold
             // the decrypted text.
-            string plaintext = null;
+            string plaintext = "";
 
             // Create an Aes object
             // with the specified key and IV.
@@ -96,9 +106,23 @@ namespace blogServer
                 var dataBytes = Convert.FromBase64String(base64);
                 var a = DecryptStringFromBytes_Aes(dataBytes, keyBytes, ivBytes);
                 return a;
-            }catch
+            }
+            catch
             {
                 return base64;
+            }
+        }
+        public static string encode(string data)
+        {
+            try
+            {
+                var a = EncryptStringToBytes_Aes(data, keyBytes, ivBytes);
+                var base64 = Convert.ToBase64String(a);
+                return base64;
+            }
+            catch
+            {
+                return data;
             }
         }
     }

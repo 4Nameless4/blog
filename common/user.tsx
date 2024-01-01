@@ -3,7 +3,7 @@ import { t_user } from "./types";
 import { checkUser } from "./api";
 import { aesEncode2base64, base642aesDecode } from "./utils";
 
-export function getLocalUser(): t_user | null {
+export function getLocalUser(): (t_user & { token: string }) | null {
   const userStr = sessionStorage.getItem("user");
   if (!userStr) {
     return null;
@@ -15,8 +15,13 @@ export function getLocalUser(): t_user | null {
     return null;
   }
 }
-export function setLocalUser(user: t_user) {
-  const userBase = aesEncode2base64(JSON.stringify(user));
+export function setLocalUser(user: t_user, token: string) {
+  const userBase = aesEncode2base64(
+    JSON.stringify({
+      ...user,
+      token,
+    })
+  );
   sessionStorage.setItem("user", userBase);
 }
 export function clearLocalUser() {
@@ -28,11 +33,10 @@ export async function getUser(): Promise<t_user | false> {
   if (user) {
     const checkInfo = await checkUser(user.token || "");
     info = checkInfo;
+    info && setLocalUser(info, user.token);
   }
   if (!info) {
     clearLocalUser();
-  } else {
-    setLocalUser(info);
   }
   return info;
 }
