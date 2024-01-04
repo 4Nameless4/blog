@@ -4,7 +4,6 @@ using JWT.Builder;
 using JWT.Exceptions;
 using JWT.Serializers;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
-using Org.BouncyCastle.Utilities;
 using System.Security.Claims;
 using System.Text;
 

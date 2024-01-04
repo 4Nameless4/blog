@@ -53,3 +53,8 @@ export async function signup(name: string, pwd: string, nickname: string) {
   }
   return info;
 }
+
+export function linkWebsocketServer() {
+  const ws = new WebSocket("ws://localhost:5136/ws");
+  return ws;
+}

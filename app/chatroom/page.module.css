@@ -1,0 +1,43 @@
+.chat-room-page {
+  display: grid;
+  grid-template-columns: minmax(5rem, 10rem) 3fr;
+  grid-template-rows: 1fr;
+}
+
+.chat-aside li {
+  list-style: none;
+}
+
+.user-info-item {
+  margin: 1rem;
+}
+.user-info-item.me {
+  border: 1px solid red;
+}
+
+.msg-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.msg-item {
+  display: flex;
+  margin: 0.5rem;
+  padding: 0.5rem;
+}
+
+.msg-item .user-icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+}
+
+.msg-item.me {
+  border: 1px solid red;
+
+  flex-direction: row-reverse;
+}
+
+.msg-box {
+  padding: 0.25rem;
+}
