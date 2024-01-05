@@ -1,3 +1,4 @@
+"use server"
 import { t_user } from "./types";
 import { aesEncode2base64 } from "./utils";
 
@@ -52,9 +53,4 @@ export async function signup(name: string, pwd: string, nickname: string) {
     info = result.data;
   }
   return info;
-}
-
-export function linkWebsocketServer() {
-  const ws = new WebSocket("ws://localhost:5136/ws");
-  return ws;
 }

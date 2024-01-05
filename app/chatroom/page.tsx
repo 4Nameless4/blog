@@ -1,15 +1,27 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { t_user } from "@/common/types";
-import { linkWebsocketServer } from "@/common/api";
 import { getUser } from "@/common/user";
 import { redirect } from "next/navigation";
 import style from "./page.module.css";
+import { aesEncode2base64, base642aesDecode } from "@/common/utils";
 
 interface t_msg {
   time: number;
   user: t_user;
   msg: string;
+}
+
+function linkWebsocketServer() {
+  "use client";
+  const server = process.env.SERVER || "http://localhost:14513";
+  let wsUrl = "";
+  const scheme = document.location.protocol === "https:" ? "wss" : "ws";
+  wsUrl = server.replace(/https?:/, scheme + ":") + "/chatroom/ws";
+
+  console.log(wsUrl);
+  const ws = new WebSocket(wsUrl);
+  return ws;
 }
 
 function renderUserList(users: t_user[], me: t_user | null) {
@@ -45,15 +57,27 @@ function renderMSGList(messages: t_msg[], me: t_user | null) {
   return msgList;
 }
 
-function renderInput(onclick: () => void) {
+function renderInput(
+  inputRef: MutableRefObject<HTMLInputElement | null>,
+  onclick: () => void
+) {
   return (
     <div>
-      <input></input>
+      <input ref={inputRef}></input>
       <button onClick={onclick}>send</button>
     </div>
   );
 }
+function getUTF8ByteLength(str: string) {
+  const encoder = new TextEncoder();
+  return encoder.encode(str).byteLength;
+}
+function isLimit(str: string) {
+  const StrUTF8ByteLength = 1024 * 4;
+  const length = getUTF8ByteLength(str);
 
+  return length >= StrUTF8ByteLength;
+}
 export default function ChatRoomPage() {
   const [me, setMe] = useState<null | t_user>(null);
   const [users, setUsers] = useState<t_user[]>([]);
@@ -101,23 +125,27 @@ export default function ChatRoomPage() {
     setMsg(msg);
 
     // setMe(createTempUser());
-    // const ws = linkWebsocketServer();
-    // ws.addEventListener("message", (event) => {
-    //   console.log("server message");
-    //   console.log(event);
-    //   // setMsg((msg) => {
-    //   //   msg.push({
-    //   //     user: { uuid: "asd", nickname: "", name: "" },
-    //   //     time: 0,
-    //   //     msg: "11111",
-    //   //   });
-    //   //   return msg.concat([]);
-    //   // });
-    // });
-    // setWs(ws);
-    // return () => {
-    //   ws.close();
-    // };
+    const ws = linkWebsocketServer();
+    ws.addEventListener("message", (event) => {
+      const value = base642aesDecode(event.data);
+      console.log("server message");
+      console.log(event);
+      console.log(event.data);
+      console.log(value);
+      setMsg((msg) => {
+        msg.push({
+          user: { uuid: "asd", nickname: "", name: "", role: "user" },
+          time: 0,
+          msg: "11111",
+        });
+        return msg.concat([]);
+      });
+    });
+    setWs(ws);
+    return () => {
+      ws.close();
+      setWs(null);
+    };
   }, []);
 
   return (
@@ -128,10 +156,16 @@ export default function ChatRoomPage() {
       <div className={style["chat-body"]}>
         <div className={style["msg-body"]}>{renderMSGList(messages, me)}</div>
         <div>
-          {renderInput(() => {
+          {renderInput(inputRef, () => {
             const input = inputRef.current;
-            if (!input || !ws) return;
-            ws.send(input.value);
+            if (!input || !ws || ws.readyState !== WebSocket.OPEN || !me)
+              return;
+            const value = aesEncode2base64(
+              JSON.stringify({ from: me.uuid, value: input.value })
+            );
+            console.log("Send");
+            console.log({ from: me.uuid, value: input.value });
+            ws.send(value);
             input.value = "";
           })}
         </div>

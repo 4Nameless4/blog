@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Linq;
@@ -98,6 +99,35 @@ namespace blogServer.Common
             }
 
             return plaintext;
+        }
+        public static string decode(byte[] base64DataBytes, int start, int count)
+        {
+            var base64 = "";
+            try
+            {
+                base64 = Encoding.Default.GetString(base64DataBytes, start, count);
+                var dataBytes = Convert.FromBase64String(base64);
+                var a = DecryptStringFromBytes_Aes(dataBytes, keyBytes, ivBytes);
+                return a;
+            }
+            catch
+            {
+                return base64;
+            }
+        }
+        public static string decode(byte[] base64DataBytes)
+        {
+            var base64 = "";
+            try
+            {
+                base64 = Encoding.Default.GetString(base64DataBytes);
+                var a = DecryptStringFromBytes_Aes(base64DataBytes, keyBytes, ivBytes);
+                return a;
+            }
+            catch
+            {
+                return base64;
+            }
         }
         public static string decode(string base64)
         {
