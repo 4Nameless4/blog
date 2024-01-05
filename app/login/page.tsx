@@ -173,38 +173,47 @@ export default function LoginPage() {
   }
 
   function renderSign(isSignUp: boolean) {
+    const isBind = active !== isSignUp;
     return (
       <>
         <MyInput
           value={name}
-          label="User Name"
+          label="User name"
+          innerLabel={"username" + String(isSignUp)}
           placeholder="Entry User Name"
           require={isSignUp}
           onChange={(val) => {
+            if (!isBind) return;
             setName(val);
             return (isSignUp && nameCheck(val)) || void 0;
           }}
+          icon={<UseSVG name="user2"></UseSVG>}
         />
 
         <MyInput
           value={pwd}
           label="Password"
+          innerLabel={"password" + String(isSignUp)}
           placeholder="Entry Password"
           type="password"
           require={isSignUp}
           onChange={(val) => {
+            if (!isBind) return;
             setPwd(val);
             return (isSignUp && pwdCheck(val)) || void 0;
           }}
+          icon={<UseSVG name="password"></UseSVG>}
         />
 
         {isSignUp ? (
           <MyInput
             value={nickname}
             label="Nickname"
+            innerLabel={"nickname" + String(isSignUp)}
             placeholder="Entry Nickname"
             require={isSignUp}
             onChange={(val) => {
+              if (!isBind) return;
               setNickname(val);
               return (isSignUp && nicknameCheck(val)) || void 0;
             }}
@@ -214,12 +223,26 @@ export default function LoginPage() {
     );
   }
 
+  function _renderView(type: "in" | "up" | "info" = "in") {
+    const isInfo = type === "info";
+    const isUp = type === "up";
+    return (
+      <div className={`${style.viewSize} ${style.view} ${style.innerView}`}>
+        <h3 className={style.title}>
+          {isInfo ? "User info" : !isUp ? "Sign in" : "Sign up"}
+        </h3>
+        {isInfo ? renderInfo() : renderSign(isUp)}
+      </div>
+    );
+  }
+
   function renderView() {
     return (
-      <div
-        className={`flex justify-center items-center flex-col ${style.view}`}
-      >
-        {user && active ? renderInfo() : renderSign(!active)}
+      <div className={`${style.viewSize} relative`}>
+        <div className={`${style.viewport}`}>
+          {_renderView(active && user ? "info" : "in")}
+        </div>
+        <div className={`${style.viewport}`}>{_renderView("up")}</div>
       </div>
     );
   }
@@ -246,7 +269,7 @@ export default function LoginPage() {
     <section
       className={`w-full h-full flex justify-center items-center flex-col ${
         active ? style.active : ""
-      }`}
+      } ${style.root}`}
     >
       <form
         className={`${style.card} backdrop-blur p-8 rounded shadow-lg rounded-xl overflow-hidden`}
@@ -254,7 +277,7 @@ export default function LoginPage() {
         <div
           className={style.tab}
           onClick={() => setActive(!active)}
-          title={active ? "Sign Up" : "Sign In"}
+          title={active ? "Check to Sign Up" : "Check to Sign In"}
         >
           <UseSVG name={active ? "signup" : "signin"} />
         </div>

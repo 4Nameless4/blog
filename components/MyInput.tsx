@@ -16,6 +16,9 @@ export default forwardRef(function MyInput(
     title?: string;
     label?: string;
     onChange?: (value: string) => void | t_myinput_return_status;
+    icon?: JSX.Element;
+    // label for input id
+    innerLabel?: string;
   },
   ref: ForwardedRef<HTMLInputElement>
 ) {
@@ -26,6 +29,8 @@ export default forwardRef(function MyInput(
     title = "",
     label = "",
     value,
+    icon,
+    innerLabel,
     onChange,
   } = opts;
 
@@ -33,19 +38,26 @@ export default forwardRef(function MyInput(
   const [status, setStatus] = useState<t_myinput_status>("none");
 
   return (
-    <div className={`${style.root} ${style[status]}`} title={title}>
+    <div
+      className={`${style.root} ${style[status]} ${
+        innerLabel ? style.innerLabel : ""
+      }`}
+      title={title || label}
+    >
       <div className={style.labelContainer}>
         {require ? <span style={{ color: "red" }}>*</span> : null}
-        <span>{label}</span>
+        <span>{innerLabel ? "" : label}</span>
       </div>
       <div className={style.inputContainer}>
-        <div className={style.textInputContainer}>
+        <label className={style.textInputContainer} htmlFor={innerLabel}>
           <input
+            id={innerLabel}
             value={value}
             ref={ref}
             type={type}
             placeholder={placeholder}
             className={style.textInput}
+            autoComplete={type === "password" ? "off" : undefined}
             onChange={(e) => {
               const val = e.currentTarget.value;
               let msg = "";
@@ -65,7 +77,11 @@ export default forwardRef(function MyInput(
               setStatus(status);
             }}
           ></input>
-        </div>
+          <span className={style.textInputInnerText}>
+            {innerLabel ? label : ""}
+          </span>
+          <div className={style.icon}>{icon}</div>
+        </label>
         <div className={style.msg}>{msg}</div>
       </div>
     </div>

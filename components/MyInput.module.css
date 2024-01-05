@@ -1,41 +1,96 @@
 .root {
   display: flex;
   width: 100%;
+  font-size: 1rem;
   --success-color: #008bc3;
   --error-color: red;
   --warn-color: #faad14;
-}
-.textInput {
-  background-color: transparent;
-  border: none;
-  outline: none;
-  position: relative;
+  --icon-size: 1.65em;
+  --transition-time: 0.3s;
 }
 .labelContainer {
-  flex-basis: 33%;
-  text-align: right;
+  /* flex-basis: 33%; */
+  max-width: 33%;
+  overflow: hidden;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 .labelContainer > * {
-  margin-right: 1rem;
+  margin-right: 1em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: right;
+  overflow: hidden;
 }
 .inputContainer {
   flex: 1;
+  min-width: 5em;
 }
 .textInputContainer {
+  height: 3em;
+  width: 100%;
+  position: relative;
   display: inline-block;
+  cursor: pointer;
 }
 .textInputContainer::after {
   content: "";
-  position: relative;
+  position: absolute;
   width: 80%;
   display: block;
   will-change: width;
-  transition: width 0.2s linear;
+  transition: width var(--transition-time), border-color var(--transition-time);
   bottom: -3px;
   border-bottom: 1px solid #9b9b9b;
 }
 .textInputContainer:focus-within::after {
   width: 100%;
+  border-color: #000000;
+}
+.textInputInnerText,
+.textInput {
+  display: block;
+}
+.textInputInnerText {
+  position: absolute;
+  bottom: 10%;
+  margin-left: 0.25em;
+  font-size: 0.9em;
+  font-weight: bold;
+  will-change: bottom;
+  transition: bottom var(--transition-time), font-size var(--transition-time);
+}
+.textInput {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  outline: none;
+
+  box-sizing: border-box;
+  will-change: height;
+  padding: 0 var(--icon-size) 0 0.5em;
+
+  will-change: height;
+  transition: height var(--transition-time);
+}
+.innerLabel .textInput {
+  height: 0;
+}
+.root:not(.innerLabel) .textInput {
+  height: 100%;
+}
+.textInput:focus,
+.textInput:not(:placeholder-shown) {
+  height: 100%;
+}
+:is(.textInput:focus, .textInput:not(:placeholder-shown))
+  ~ .textInputInnerText {
+  bottom: calc(100% + 0.1em);
+  opacity: 0.7;
+  font-size: 0.8em;
 }
 .root.error .textInputContainer::after {
   border-color: var(--error-color);
@@ -57,4 +112,12 @@
 }
 .root.success .msg {
   color: var(--success-color);
+}
+.icon {
+  display: inline-block;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: var(--icon-size);
+  height: var(--icon-size);
 }

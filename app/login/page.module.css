@@ -1,7 +1,15 @@
+.root {
+  --transition-time: 0.4s;
+  --view-size: 0px;
+}
+.root.active {
+  --view-size: 100%;
+}
 .card {
   display: grid;
   grid-template-columns: 1fr 2rem;
   grid-template-rows: 1fr;
+  box-shadow: 0px 0px 3px 2px #c5c5c5;
 }
 .tab {
   position: absolute;
@@ -11,7 +19,7 @@
   cursor: pointer;
   user-select: none;
   z-index: 10;
-  transition: all 0.3s linear;
+  transition: all var(--transition-time) linear;
   background-color: rgb(155, 205, 255);
   left: 2rem;
   padding: 0.4rem;
@@ -21,7 +29,6 @@
 }
 .tab:hover {
   filter: brightness(1.2);
-  transform: translateX(0);
 }
 .active .tab {
   left: calc(100% - 2rem);
@@ -39,10 +46,21 @@
 .icon {
   transform: translate(-100%, -100%);
 }
-.view {
+.viewSize {
   width: 40rem;
   height: 25rem;
-  gap: 4rem;
+}
+.view {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 3rem;
+}
+.innerView {
+  /* padding: 20%; */
+  box-sizing: border-box;
 }
 .message {
   margin-top: 1rem;
@@ -68,10 +86,7 @@
   inset: -0.25rem;
   z-index: -1;
   /* background-color: hsl(224, 44%, 42%); */
-  background-image: conic-gradient(
-    hsl(224, 90%, 66%) 80deg,
-    transparent 80deg
-  );
+  background-image: conic-gradient(hsl(224, 90%, 66%) 80deg, transparent 80deg);
   border-radius: 50%;
   animation: rotate 5s ease-in alternate infinite;
 }
@@ -108,4 +123,44 @@
   width: 3rem;
   height: 3rem;
   margin: 0 auto;
+}
+
+.title {
+  text-wrap: nowrap;
+  position: absolute;
+  top: 0;
+  font-size: 2.5rem;
+  font-weight: bold;
+
+  box-sizing: border-box;
+  border-radius: 999px;
+  padding: 0.5rem;
+
+  background: linear-gradient(45deg, #4b4f4e, #b39caf, #5580a5);
+  background-clip: text;
+  color: transparent;
+}
+
+.viewport {
+  position: absolute;
+  overflow: hidden;
+  will-change: width;
+  transition: width var(--transition-time);
+  width: 100%;
+  height: 100%;
+}
+
+.viewport:nth-child(1) {
+  left: 0;
+  width: var(--view-size);
+}
+.viewport:nth-child(1) .view {
+  left: 0;
+}
+.viewport:nth-child(2) {
+  right: 0;
+  width: calc(100% - var(--view-size));
+}
+.viewport:nth-child(2) .view {
+  right: 0;
 }
