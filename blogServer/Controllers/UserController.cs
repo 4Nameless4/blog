@@ -24,10 +24,10 @@ namespace blogServer.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        private static string selectUserSql = "select t1.uuid,t1.name,t1.nickname,t1.pwd,t1.email,t1.create_time,t1.role from user as t1";
-        private static string insertUserSql = "INSERT INTO `blog`.`user` (`id`, `uuid`, `name`, `pwd`, `role`, `nickname`) VALUES ('3', '4', 'asdfg', 'asdfg', '2', 'asdfg');";
-        private static string selectRoleSql = "select * from permissions as t1";
-        public static List<string> tokens = [];
+        // private static string selectUserSql = "select t1.uuid,t1.name,t1.nickname,t1.pwd,t1.email,t1.create_time,t1.role from user as t1";
+        // private static string insertUserSql = "INSERT INTO `blog`.`user` (`id`, `uuid`, `name`, `pwd`, `role`, `nickname`) VALUES ('3', '4', 'asdfg', 'asdfg', '2', 'asdfg');";
+        // private static string selectRoleSql = "select * from permissions as t1";
+        public static List<string> tokens = new List<string>();
         private readonly BlogContext blogContext;
         public UserController(BlogContext context)
         {
@@ -85,7 +85,7 @@ namespace blogServer.Controllers
         //}
         // parameter base64: {name:string;pwd:string;nickname:string}
         [HttpPost("signup")]
-        public Result<bool> Signup([FromBody] string base64)
+        public string Signup([FromBody] string base64)
         {
             Result<bool> res = new Result<bool>() { code = "0", data = false, msg = "" };
             try
@@ -98,7 +98,7 @@ namespace blogServer.Controllers
                     if (_user != null)
                     {
                         res.msg = "user exist";
-                        return res;
+                        return res.encode();
                     }
                     else
                     {
@@ -113,11 +113,11 @@ namespace blogServer.Controllers
             {
                 res.msg = ex.Message;
             }
-            return res;
+            return res.encode();
         }
         // parameter base64: token string
         [HttpPost("check")]
-        public Result<User> Check([FromBody] string base64)
+        public string Check([FromBody] string base64)
         {
             Result<User> res = new Result<User>() { code = "0", data = new User(), msg = "" };
             try
@@ -128,13 +128,13 @@ namespace blogServer.Controllers
                 {
                     User tokenUser = JsonConvert.DeserializeObject<User>(r) ?? new Models.User();
                     var dataUser = blogContext.users.Single((b) => b.name == tokenUser.name && b.uuid == tokenUser.uuid && b.role == tokenUser.role);
-                    var flag = tokens.Contains(token);
+                    var flag = tokens.Exists(d => d.Trim() == token.Trim());
                     if (dataUser != null && flag)
                     {
                         res.code = "1";
                         dataUser.pwd = "";
                         res.data = dataUser;
-                        return res;
+                        return res.encode();
                     }
                     else
                     {
@@ -147,11 +147,11 @@ namespace blogServer.Controllers
                 res.msg = ex.Message;
             }
 
-            return res;
+            return res.encode();
         }
         // parameter base64: {name:string;pwd:string}
         [HttpPost("signin")]
-        public Result<IDictionary<string, object>> Signin([FromBody] string base64)
+        public string Signin([FromBody] string base64)
         {
             Result<IDictionary<string, object>> res = new Result<IDictionary<string, object>>() { code = "0", data = new Dictionary<string, object>(), msg = "" };
 
@@ -167,6 +167,20 @@ namespace blogServer.Controllers
                     res.code = "1";
                     _user.pwd = "";
                     res.data = new Dictionary<string, object>() { { "token", token }, { "uuid", _user.uuid }, { "name", _user.name }, { "nickname", _user.nickname }, { "email", _user.email ?? "" }, { "role", _user.role }, { "createTime", _user.createTime ?? new DateTime(2000,1,1,0,0,0) } };
+
+                    var oldToken = tokens.Find(d =>
+                    {
+                        var r = TokenHelper.ValidateJwtToken(d);
+                        if (r != null)
+                        {
+                            User tokenUser = JsonConvert.DeserializeObject<User>(r) ?? new Models.User();
+                            return tokenUser.uuid == _user.uuid;
+                        }
+                        return false;
+                    });
+                    if (oldToken != null) {
+                        tokens.Remove(oldToken);
+                    }
                     tokens.Add(token);
                 }
                 else
@@ -179,7 +193,7 @@ namespace blogServer.Controllers
             {
                 res.msg = ex.Message;
             }
-            return res;
+            return res.encode();
         }
     }
 }

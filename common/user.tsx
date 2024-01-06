@@ -22,10 +22,10 @@ export function setLocalUser(user: t_user, token: string) {
       token,
     })
   );
-  sessionStorage.setItem("user", userBase);
+  localStorage.setItem("user", userBase);
 }
 export function clearLocalUser() {
-  sessionStorage.removeItem("user");
+  localStorage.removeItem("user");
 }
 export async function getUser(): Promise<t_user | false> {
   const user = getLocalUser();

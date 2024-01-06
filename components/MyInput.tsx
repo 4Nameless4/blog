@@ -46,7 +46,7 @@ export default forwardRef(function MyInput(
     >
       <div className={style.labelContainer}>
         {require ? <span style={{ color: "red" }}>*</span> : null}
-        <span>{innerLabel ? "" : label}</span>
+        {!innerLabel && label ? <span>{label}</span> : null}
       </div>
       <div className={style.inputContainer}>
         <label className={style.textInputContainer} htmlFor={innerLabel}>

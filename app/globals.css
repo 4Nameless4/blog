@@ -28,12 +28,12 @@ body {
   padding: 1rem;
 }
 
-main > * {
+main > .viewbox {
   margin: 0 auto;
 }
 
 @media screen and (min-width: 1200px) {
-  main > * {
+  main > .viewbox {
     max-width: 1200px;
   }
 }

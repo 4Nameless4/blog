@@ -1,8 +1,8 @@
-"use server"
+// "use server"
 import { t_user } from "./types";
-import { aesEncode2base64 } from "./utils";
+import { aesEncode2base64, base642aesDecode } from "./utils";
 
-type t_result<T = unknown> = {
+export type t_result<T = unknown> = {
   code: string;
   data: T;
   msg: string;
@@ -27,18 +27,20 @@ export async function signin(name: string, pwd: string) {
     aesEncode2base64(JSON.stringify({ name, pwd }))
   );
   let info: false | (t_user & { token: string }) = false;
-  const result: t_result<t_user & { token: string }> = await res.json();
-  if (result.code === "1") {
-    info = result.data;
+  const result: string = base642aesDecode(await res.json());
+  const resultJson: t_result<t_user & { token: string }> = JSON.parse(result);
+  if (resultJson.code === "1") {
+    info = resultJson.data;
   }
   return info;
 }
 export async function checkUser(token: string) {
   const res = await request("/User/check", aesEncode2base64(token));
   let info: false | t_user = false;
-  const result: t_result<t_user> = await res.json();
-  if (result.code === "1") {
-    info = result.data;
+  const result: string = base642aesDecode(await res.json());
+  const resultJson: t_result<t_user & { token: string }> = JSON.parse(result);
+  if (resultJson.code === "1") {
+    info = resultJson.data;
   }
   return info;
 }
@@ -48,9 +50,10 @@ export async function signup(name: string, pwd: string, nickname: string) {
     aesEncode2base64(JSON.stringify({ name, nickname, pwd }))
   );
   let info: boolean = false;
-  const result: t_result<boolean> = await res.json();
-  if (result.code === "1") {
-    info = result.data;
+  const result: string = base642aesDecode(await res.json());
+  const resultJson: t_result<boolean> = JSON.parse(result);
+  if (resultJson.code === "1") {
+    info = resultJson.data;
   }
   return info;
 }

@@ -159,8 +159,8 @@ export default function LoginPage() {
         </div>
 
         <Button
-          title="Logout"
           type="primary"
+          title="Logout"
           icon={<PoweroffOutlined />}
           onClick={() => {
             clearLocalUser();
@@ -223,26 +223,17 @@ export default function LoginPage() {
     );
   }
 
-  function _renderView(type: "in" | "up" | "info" = "in") {
+  function renderView(type: "in" | "up" | "info" = "in") {
     const isInfo = type === "info";
     const isUp = type === "up";
     return (
-      <div className={`${style.viewSize} ${style.view} ${style.innerView}`}>
-        <h3 className={style.title}>
-          {isInfo ? "User info" : !isUp ? "Sign in" : "Sign up"}
-        </h3>
-        {isInfo ? renderInfo() : renderSign(isUp)}
-      </div>
-    );
-  }
-
-  function renderView() {
-    return (
-      <div className={`${style.viewSize} relative`}>
-        <div className={`${style.viewport}`}>
-          {_renderView(active && user ? "info" : "in")}
-        </div>
-        <div className={`${style.viewport}`}>{_renderView("up")}</div>
+      <div className={`${style.viewport}`}>
+        <form className={`${style.viewSize} ${style.view} ${style.innerView}`}>
+          <h3 className={style.title}>
+            {isInfo ? "User info" : !isUp ? "Sign in" : "Sign up"}
+          </h3>
+          {isInfo ? renderInfo() : renderSign(isUp)}
+        </form>
       </div>
     );
   }
@@ -265,14 +256,15 @@ export default function LoginPage() {
       </div>
     );
   }
+
   return (
     <section
-      className={`w-full h-full flex justify-center items-center flex-col ${
+      className={`viewbox w-full h-full flex justify-center items-center flex-col ${
         active ? style.active : ""
       } ${style.root}`}
     >
-      <form
-        className={`${style.card} backdrop-blur p-8 rounded shadow-lg rounded-xl overflow-hidden`}
+      <div
+        className={`${style.card} backdrop-blur p-8 rounded shadow-lg rounded-xl overflow-hidden relative`}
       >
         <div
           className={style.tab}
@@ -281,9 +273,12 @@ export default function LoginPage() {
         >
           <UseSVG name={active ? "signup" : "signin"} />
         </div>
-        {renderView()}
+        <div className={`${style.viewSize} relative`}>
+          {renderView(user ? "info" : "in")}
+          {renderView("up")}
+        </div>
         {renderBtn()}
-      </form>
+      </div>
       <div className={style.message}>
         <span>{msg}</span>
       </div>

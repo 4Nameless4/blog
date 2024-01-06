@@ -8,7 +8,7 @@ import UseSVG from "../../components/usesvg";
 import { getDescSec } from "./sections";
 import style from "./page.module.css";
 import { getUser } from "@/common/user";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 function base64ToBytes(base64: string) {
   const binString = window.atob(base64);
@@ -56,7 +56,9 @@ function fillResumeTemplate(arraybuffer: ArrayBuffer, json: any) {
 }
 
 function renderNotAllowPage() {
-  return <div className="flex justif-center items-center">Not Allow</div>;
+  return (
+    <div className="viewbox flex justif-center items-center">Not Allow</div>
+  );
 }
 
 export default function ResumePage() {
@@ -71,8 +73,8 @@ export default function ResumePage() {
 
   useEffect(() => {
     getUser().then((d) => {
-      if (!d || d.role !== "admin") {
-        redirect("/login");
+      if (!d || d.role !== 1) {
+        router.replace("/login");
       } else {
         setAllow(true);
       }
@@ -130,7 +132,7 @@ export default function ResumePage() {
   }, [resumeFillBlob]);
   function renderPage() {
     return (
-      <article className={style.resume}>
+      <article className={`${style.resume} viewbox`}>
         <Modal
           title="预览"
           open={isModalOpen}
