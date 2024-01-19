@@ -70,11 +70,13 @@ export default function ResumePage() {
   const [resumeJSON, setResumeJSON] = useState<null | Record<string, any>>(
     null
   );
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     getUser().then((d) => {
       if (!d || d.role !== 1) {
         router.replace("/login");
+        setLoading(false);
       } else {
         setAllow(true);
       }
@@ -98,6 +100,7 @@ export default function ResumePage() {
       blob.arrayBuffer().then((d) => {
         const fillBlob = fillResumeTemplate(d, jsonObj);
         setResumeFillBlob(fillBlob);
+        setLoading(false);
       });
     });
   }, [allow]);
@@ -144,7 +147,7 @@ export default function ResumePage() {
         >
           {dialogContent}
         </Modal>
-        {getDescSec(resumeJSON)}
+        {resumeJSON ? getDescSec(resumeJSON) : null}
         <FloatButton
           icon={<UseSVG name="download" />}
           onClick={() => {
@@ -154,5 +157,12 @@ export default function ResumePage() {
       </article>
     );
   }
-  return allow ? renderPage() : renderNotAllowPage();
+  function renderLoading() {
+    return <Spin />;
+  }
+  return loading
+    ? renderLoading()
+    : allow
+    ? renderPage()
+    : renderNotAllowPage();
 }

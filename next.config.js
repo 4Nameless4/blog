@@ -1,11 +1,34 @@
 /** @type {import('next').NextConfig} */
-const {
+const os = require("os");
+let {
   NODE_ENV,
   server,
   server_production,
   staticResourceServer,
   staticResourceServer_production,
 } = process.env;
+
+function getIpAddress() {
+  var ifaces = os.networkInterfaces();
+
+  for (var dev in ifaces) {
+    let iface = ifaces[dev];
+
+    for (let i = 0; i < iface.length; i++) {
+      let { family, address, internal } = iface[i];
+
+      if (family === "IPv4" && address !== "127.0.0.1" && !internal) {
+        return address;
+      }
+    }
+  }
+}
+
+const ip = getIpAddress();
+
+server = server.replace(/localhost/g, ip);
+staticResourceServer = staticResourceServer.replace(/localhost/g, ip);
+
 const nextConfig = {
   //   i18n: {
   //     defaultLocale: "zh",

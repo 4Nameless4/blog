@@ -4,7 +4,7 @@ import { checkUser } from "./api";
 import { aesEncode2base64, base642aesDecode } from "./utils";
 
 export function getLocalUser(): (t_user & { token: string }) | null {
-  const userStr = sessionStorage.getItem("user");
+  const userStr = localStorage.getItem("user");
   if (!userStr) {
     return null;
   }

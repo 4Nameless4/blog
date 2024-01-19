@@ -12,7 +12,7 @@ namespace blogServer.Common
                 //.SetBasePath(Directory.GetCurrentDirectory())
                 //AppDomain.CurrentDomain.BaseDirectory是程序集基目录，所以appsettings.json,需要复制一份放在程序集目录下，
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                .Add(new JsonConfigurationSource { Path = "appsettings.json", ReloadOnChange = true })
+                .Add(new JsonConfigurationSource { Path = "appsettings.json", ReloadOnChange = false })
                 .Build();
             }
     }
