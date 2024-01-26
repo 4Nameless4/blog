@@ -1,4 +1,5 @@
 .root {
+  --icon-size: 2rem;
   --padding-icon: 0.2rem;
   --main-size: calc(var(--padding-icon) + var(--icon-size));
 

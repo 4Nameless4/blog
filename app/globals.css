@@ -12,13 +12,6 @@
 body {
   color: rgb(var(--foreground-rgb));
   background: linear-gradient(45deg, transparent, #e0f9ff, #c7c7c7, #eceaff);
-
-  --icon-size: 2rem;
-}
-
-.icon {
-  width: var(--icon-size);
-  height: var(--icon-size);
 }
 
 body > main > .viewbox {
