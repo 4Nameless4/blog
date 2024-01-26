@@ -1,5 +1,35 @@
-.resume {
+.resume-page-root {
   background: #fff9f4;
   padding: 2rem;
   border-radius: 10px;
+}
+.article-sec {
+  /* width: 100%; */
+  min-height: 5rem;
+  background-color: rgba(64, 64, 64, 0.155);
+  backdrop-filter: blur(10px);
+  margin: 1rem 0;
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.article-sec > * {
+  margin: 0.6rem 0;
+}
+
+.title {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 700;
+}
+.childTitle {
+  font-weight: 500;
+}
+
+.structure {
+  font-style: italic;
+}
+
+.paragraph {
+  text-indent: 2rem;
 }

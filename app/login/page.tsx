@@ -1,6 +1,6 @@
 "use client";
-import { Button } from "antd";
 import style from "./page.module.css";
+import { Button } from "antd";
 import { useEffect, useState } from "react";
 import { PoweroffOutlined } from "@ant-design/icons";
 import MyInput, {
@@ -148,13 +148,13 @@ export default function LoginPage() {
     return (
       <>
         <div>
-          <span className={style.userIcon} title={user.nickname}>
+          <span className={style["user-icon"]} title={user.nickname}>
             {user.nickname.split("")[0]}
           </span>
-          <div className={style.userInfo}>
-            <span className={style.userUUID}>UUID: {user.uuid}</span>
-            <span className={style.userName}>Account: {user.name}</span>
-            <span className={style.userRole}>Level: {user.role}</span>
+          <div className={style["user-info"]}>
+            <span className={style["user-uuid"]}>UUID: {user.uuid}</span>
+            <span className={style["user-name"]}>Account: {user.name}</span>
+            <span className={style["user-role"]}>Level: {user.role}</span>
           </div>
         </div>
 
@@ -228,7 +228,7 @@ export default function LoginPage() {
     const isUp = type === "up";
     return (
       <div className={`${style.viewport}`}>
-        <form className={`${style.viewSize} ${style.view} ${style.innerView}`}>
+        <form className={`${style["view-size"]} ${style.view}`}>
           <h3 className={style.title}>
             {isInfo ? "User info" : !isUp ? "Sign in" : "Sign up"}
           </h3>
@@ -240,12 +240,12 @@ export default function LoginPage() {
   function renderBtn() {
     if (user && active) return null;
     return (
-      <div className={style.btnContainer}>
+      <div className={style["btn-container"]}>
         <Button
           type="primary"
           disabled={!check}
           icon={
-            <div className={style.icon}>
+            <div className={style["btn-icon"]}>
               <PoweroffOutlined />
             </div>
           }
@@ -259,9 +259,11 @@ export default function LoginPage() {
 
   return (
     <section
-      className={`viewbox w-full h-full flex justify-center items-center flex-col ${
-        active ? style.active : ""
-      } ${style.root}`}
+      className={`viewbox ${
+        style["login-page-root"]
+      } w-full h-full flex justify-center items-center flex-col ${
+        active ? style["active"] : ""
+      }`}
     >
       <div
         className={`${style.card} backdrop-blur p-8 rounded shadow-lg rounded-xl overflow-hidden relative`}
@@ -273,7 +275,7 @@ export default function LoginPage() {
         >
           <UseSVG name={active ? "signup" : "signin"} />
         </div>
-        <div className={`${style.viewSize} relative`}>
+        <div className={`${style["view-size"]} relative`}>
           {renderView(user ? "info" : "in")}
           {renderView("up")}
         </div>

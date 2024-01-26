@@ -21,19 +21,12 @@ body {
   height: var(--icon-size);
 }
 
-.card {
-  min-width: 45rem;
-  min-height: 30rem;
-  border: 1px solid #fff;
-  padding: 1rem;
-}
-
-main > .viewbox {
+body > main > .viewbox {
   margin: 0 auto;
 }
 
 @media screen and (min-width: 1200px) {
-  main > .viewbox {
+  body > main > .viewbox {
     max-width: 1200px;
   }
 }

@@ -5,7 +5,6 @@ import Pizzip from "pizzip";
 import DocxTemplater from "docxtemplater";
 import { saveAs } from "file-saver";
 import UseSVG from "../../components/usesvg";
-import { getDescSec } from "./sections";
 import style from "./page.module.css";
 import { getUser } from "@/common/user";
 import { useRouter } from "next/navigation";
@@ -53,6 +52,43 @@ function fillResumeTemplate(arraybuffer: ArrayBuffer, json: any) {
       "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   });
   return blob;
+}
+
+function forSec(arr: string[]) {
+  return arr.map((d, i) => {
+    return (
+      <p className={style.paragraph} key={i}>
+        - {d}
+      </p>
+    );
+  });
+}
+
+export function getDescSec(resumeJSON: Record<string, any> | null) {
+  const projects = (resumeJSON && resumeJSON["projects"]) || [];
+  const _projects = projects.map((d: any, index: number) => {
+    return (
+      <article key={index} className={style["article-sec"]}>
+        <div className={style.title}>
+          <h3>{d.name}</h3>
+          <span>[{d.duty.join("|")}]</span>
+        </div>
+        <p className={style.paragraph}>{d.desc}</p>
+        <h4 className={style.childTitle}># 难点:</h4>
+        {forSec(d.difficult)}
+        <h4 className={style.childTitle}># 业绩:</h4>
+        {forSec(d.proformance)}
+      </article>
+    );
+  });
+  return (
+    <section>
+      <p className={style.paragraph}>
+        {(resumeJSON && resumeJSON["desc"]) || ""}
+      </p>
+      {_projects}
+    </section>
+  );
 }
 
 function renderNotAllowPage() {
@@ -135,7 +171,7 @@ export default function ResumePage() {
   }, [resumeFillBlob]);
   function renderPage() {
     return (
-      <article className={`${style.resume} viewbox`}>
+      <article className={`${style["resume-page-root"]} viewbox`}>
         <Modal
           title="预览"
           open={isModalOpen}
@@ -158,7 +194,11 @@ export default function ResumePage() {
     );
   }
   function renderLoading() {
-    return <Spin />;
+    return (
+      <div className="flex justify-center items-center">
+        <Spin />
+      </div>
+    );
   }
   return loading
     ? renderLoading()

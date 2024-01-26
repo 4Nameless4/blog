@@ -1,9 +1,9 @@
-.root {
+.login-page-root {
   --transition-time: 0.6s;
   --transition-time-tab: 0.4s;
   --view-size: 0px;
 }
-.root.active {
+.login-page-root.active {
   --view-size: 100%;
 }
 .card {
@@ -35,7 +35,7 @@
   left: calc(100% - 2rem);
   transform: translateX(-100%);
 }
-.btnContainer button.btn {
+.btn {
   width: 10rem;
   height: 10rem;
   position: absolute;
@@ -44,10 +44,10 @@
   transform: translate(35%, 35%);
   border-radius: 50%;
 }
-.icon {
+.btn-icon {
   transform: translate(-100%, -100%);
 }
-.viewSize {
+.view-size {
   width: 40rem;
   height: 25rem;
 }
@@ -58,15 +58,12 @@
   align-items: center;
   flex-direction: column;
   gap: 3rem;
-}
-.innerView {
-  /* padding: 20%; */
   box-sizing: border-box;
 }
 .message {
   margin-top: 1rem;
 }
-.userIcon {
+.user-icon {
   position: relative;
   color: aliceblue;
   background-color: black;
@@ -81,7 +78,7 @@
   user-select: none;
   margin: 0 auto;
 }
-.userIcon::after {
+.user-icon::after {
   position: absolute;
   content: "";
   inset: -0.25rem;
@@ -91,7 +88,7 @@
   border-radius: 50%;
   animation: rotate 5s ease-in alternate infinite;
 }
-.userIcon::before {
+.user-icon::before {
   position: absolute;
   content: "";
   inset: -0.25rem;
@@ -105,7 +102,7 @@
   border-radius: 50%;
   animation: rotate 3s ease-out alternate infinite;
 }
-.userInfo {
+.user-info {
   display: flex;
   flex-direction: column;
   text-align: center;

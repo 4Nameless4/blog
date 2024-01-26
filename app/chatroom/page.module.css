@@ -1,21 +1,22 @@
-.chat-room-page {
+.chat-room-root {
   display: grid;
   grid-template-columns: minmax(5rem, 10rem) 3fr;
   grid-template-rows: 1fr;
 }
 
-.chat-aside li {
+.user-list li {
   list-style: none;
 }
 
-.user-info-item {
+.user-item {
   margin: 1rem;
 }
-.user-info-item.me {
+
+.user-item.me {
   border: 1px solid red;
 }
 
-.msg-body {
+.msg-list {
   display: flex;
   flex-direction: column;
 }
