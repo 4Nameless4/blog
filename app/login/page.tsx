@@ -7,9 +7,9 @@ import MyInput, {
   t_myinput_return_status,
   t_myinput_status,
 } from "@/components/MyInput";
-import { signin, signup } from "@/common/api";
 import UseSVG from "@/components/usesvg";
-import { clearLocalUser, getUser, setLocalUser } from "@/common/user";
+import { fetchJSON, getUser } from "@/common/utils";
+import { clearLocalUser, getLocalUser, setLocalUser } from "@/common/user";
 import { t_user } from "@/common/types";
 
 function strCheck(size: [number, number], match: RegExp) {
@@ -79,7 +79,11 @@ export default function LoginPage() {
 
   async function login(err: string) {
     let result = "";
-    const user = await signin(name, pwd);
+    const { data: user } = await fetchJSON(
+      "/user",
+      { type: "login", data: { name, pwd } },
+      { method: "POST" }
+    );
     if (user) {
       setUser(user);
       setLocalUser(user, user.token);
@@ -105,7 +109,11 @@ export default function LoginPage() {
     if (active) {
       result = await login("用户名或密码错误");
     } else {
-      const msg = await signup(name, nickname, pwd);
+      const { data: msg } = await fetchJSON(
+        "/user",
+        { type: "signup", data: { name, nickname, pwd } },
+        { method: "POST" }
+      );
       if (msg) {
         result = await login("注册登陆失败");
       } else {
@@ -163,6 +171,14 @@ export default function LoginPage() {
           title="Logout"
           icon={<PoweroffOutlined />}
           onClick={() => {
+            const user = getLocalUser();
+            if (user) {
+              fetchJSON(
+                "user",
+                { type: "logout", data: user.token },
+                { method: "POST" }
+              );
+            }
             clearLocalUser();
             setUser(null);
           }}

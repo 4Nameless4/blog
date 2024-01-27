@@ -6,16 +6,8 @@ import DocxTemplater from "docxtemplater";
 import { saveAs } from "file-saver";
 import UseSVG from "../../components/usesvg";
 import style from "./page.module.css";
-import { getUser } from "@/common/user";
+import { getUser } from "@/common/utils";
 import { useRouter } from "next/navigation";
-
-function base64ToBytes(base64: string) {
-  const binString = window.atob(base64);
-
-  return new TextDecoder().decode(
-    Uint8Array.from(binString as any, (m: any) => m.codePointAt(0))
-  );
-}
 
 function fillResumeTemplate(arraybuffer: ArrayBuffer, json: any) {
   const zip = new Pizzip(arraybuffer);
@@ -64,7 +56,7 @@ function forSec(arr: string[]) {
   });
 }
 
-export function getDescSec(resumeJSON: Record<string, any> | null) {
+function getDescSec(resumeJSON: Record<string, any> | null) {
   const projects = (resumeJSON && resumeJSON["projects"]) || [];
   const _projects = projects.map((d: any, index: number) => {
     return (
@@ -96,6 +88,13 @@ function renderNotAllowPage() {
     <div className="viewbox flex justif-center items-center">Not Allow</div>
   );
 }
+function renderLoading() {
+  return (
+    <div className="flex justify-center items-center">
+      <Spin />
+    </div>
+  );
+}
 
 export default function ResumePage() {
   const router = useRouter();
@@ -109,37 +108,28 @@ export default function ResumePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getUser().then((d) => {
-      if (!d || d.role !== 1) {
-        router.replace("/login");
-        setLoading(false);
-      } else {
+    getUser()
+      .then((d) => {
+        if (!d || d.role !== 1) {
+          router.replace("/login");
+          setLoading(false);
+          setAllow(false);
+          return Promise.reject();
+        }
         setAllow(true);
-      }
-    });
-  });
-  useEffect(() => {
-    if (!allow) return;
-    Promise.all([
-      fetch(process.env.StaticSERVER + "/resumeinfo").then((r) => r.text()),
-      fetch(process.env.StaticSERVER + "/resumeTemplate.docx").then((r) =>
-        r.blob()
-      ),
-    ]).then(([json, blob]) => {
-      if (!blob) return;
-      let jsonObj = {};
-      try {
-        jsonObj = JSON.parse(base64ToBytes(json));
-      } catch (e) {}
-
-      setResumeJSON(jsonObj);
-      blob.arrayBuffer().then((d) => {
-        const fillBlob = fillResumeTemplate(d, jsonObj);
+      })
+      .then(() => fetch("/resume/api"))
+      .then((d) => d.json())
+      .then(({ data }) => {
+        if (!data) return;
+        const { json, blobArray } = data;
+        const buffer = new Int8Array(blobArray);
+        setResumeJSON(json);
+        const fillBlob = fillResumeTemplate(buffer.buffer, json);
         setResumeFillBlob(fillBlob);
         setLoading(false);
       });
-    });
-  }, [allow]);
+  }, [router]);
   useEffect(() => {
     if (!allow) return;
     try {
@@ -172,17 +162,6 @@ export default function ResumePage() {
   function renderPage() {
     return (
       <article className={`${style["resume-page-root"]} viewbox`}>
-        <Modal
-          title="预览"
-          open={isModalOpen}
-          onOk={_download}
-          okText="下载"
-          onCancel={() => setIsModalOpen(false)}
-          cancelText="取消"
-          width="fit-content"
-        >
-          {dialogContent}
-        </Modal>
         {resumeJSON ? getDescSec(resumeJSON) : null}
         <FloatButton
           icon={<UseSVG name="download" />}
@@ -190,14 +169,20 @@ export default function ResumePage() {
             setIsModalOpen((d) => !d);
           }}
         ></FloatButton>
+        <div>
+          <Modal
+            title="预览"
+            open={isModalOpen}
+            onOk={_download}
+            okText="下载"
+            onCancel={() => setIsModalOpen(false)}
+            cancelText="取消"
+            width="fit-content"
+          >
+            {dialogContent}
+          </Modal>
+        </div>
       </article>
-    );
-  }
-  function renderLoading() {
-    return (
-      <div className="flex justify-center items-center">
-        <Spin />
-      </div>
     );
   }
   return loading

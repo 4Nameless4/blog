@@ -195,5 +195,11 @@ namespace blogServer.Controllers
             }
             return res.encode();
         }
+        [HttpPost("logout")]
+        public void logout([FromBody] string base64)
+        {
+            var token = CryptoHelper.decode(base64);
+            tokens.Remove(token);
+        }
     }
 }

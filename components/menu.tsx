@@ -9,6 +9,9 @@ export default function Menu() {
         <UseSVG name="house" />
       </Link>
       <div className={style.list}>
+        <Link href="/article">
+          <UseSVG name="github" />
+        </Link>
         <Link href="/resume">
           <UseSVG name="file-lines" />
         </Link>

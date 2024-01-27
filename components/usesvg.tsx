@@ -4,7 +4,7 @@ export type t_use_svg_props = {
   className?: string;
 };
 export default function UseSVG({
-  href = "sprite.svg",
+  href = "/sprite.svg",
   name,
   className = "",
 }: t_use_svg_props) {

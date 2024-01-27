@@ -1,11 +1,10 @@
 "use client";
 import style from "./page.module.css";
 import { useEffect, useRef, useState } from "react";
-import { t_user } from "@/common/types";
-import { getUser } from "@/common/user";
+import { t_result, t_user } from "@/common/types";
+import { getUser } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { aesEncode2base64, base642aesDecode } from "@/common/utils";
-import { t_result } from "@/common/api";
 
 interface t_msg {
   time: string;

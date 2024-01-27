@@ -1,9 +1,8 @@
-"use client";
-import { t_user } from "./types";
+import { t_token_user, t_user } from "./types";
 import { checkUser } from "./api";
 import { aesEncode2base64, base642aesDecode } from "./utils";
 
-export function getLocalUser(): (t_user & { token: string }) | null {
+export function getLocalUser(): t_token_user | null {
   const userStr = localStorage.getItem("user");
   if (!userStr) {
     return null;
@@ -26,17 +25,4 @@ export function setLocalUser(user: t_user, token: string) {
 }
 export function clearLocalUser() {
   localStorage.removeItem("user");
-}
-export async function getUser(): Promise<t_user | false> {
-  const user = getLocalUser();
-  let info: t_user | false = false;
-  if (user) {
-    const checkInfo = await checkUser(user.token || "");
-    info = checkInfo;
-    info && setLocalUser(info, user.token);
-  }
-  if (!info) {
-    clearLocalUser();
-  }
-  return info;
 }

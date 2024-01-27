@@ -1,7 +1,7 @@
 import startsCss from "./stars.module.css";
 import solarCss from "./solar.module.css";
 
-export function Stars() {
+export default function Stars() {
   return (
     <div className={startsCss.root}>
       <div className={solarCss.space}>

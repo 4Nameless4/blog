@@ -3,5 +3,13 @@ export type t_user = {
   name: string;
   nickname: string;
   role: number; // admin user
-  email?: string
+  email?: string;
+};
+
+export type t_token_user = t_user & { token: string };
+
+export type t_result<T = unknown> = {
+  code: string;
+  data: T;
+  msg: string;
 };
