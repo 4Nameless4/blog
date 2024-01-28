@@ -15,12 +15,12 @@
     "docx-preview": "^0.1.20",
     "docxtemplater": "^3.42.4",
     "file-saver": "^2.0.5",
-    "highlight.js": "^11.9.0",
-    "marked": "^11.1.1",
     "next": "14.0.4",
     "pizzip": "^3.1.4",
     "react": "^18",
     "react-dom": "^18",
+    "react-markdown": "^9.0.1",
+    "react-syntax-highlighter": "^15.5.0",
     "ws": "^8.15.1"
   },
   "devDependencies": {
@@ -29,6 +29,7 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@types/react-syntax-highlighter": "^15.5.11",
     "@types/ws": "^8.5.10",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
