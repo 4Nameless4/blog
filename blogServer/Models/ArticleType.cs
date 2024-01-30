@@ -3,12 +3,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace blogServer.Models
 {
-    [Table("permissions")]
-    public class Role
+    [Table("article_type")]
+    public class ArticleType
     {
         [Key]
         [Column("id")]
-        public int id { get; set; }
+        public long id { get; set; }
         [Column("name")]
         public string name { get; set; } = "";
     }

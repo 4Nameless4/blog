@@ -1,3 +1,3 @@
 export default function ShopPage() {
-  return <section className="ShopPage viewbox"></section>;
+  return <section className="ShopPage"></section>;
 }

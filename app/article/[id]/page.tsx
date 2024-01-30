@@ -1,20 +1,47 @@
+import { redirect } from "next/navigation";
 import style from "./page.module.css";
 import Markdown from "react-markdown";
 import { Prism } from "react-syntax-highlighter";
 import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { getArticle } from "@/common/api";
+import Button from "antd/es/button";
 
-export default async function ArticlePage(props: { params: { id: string } }) {
-  const articleID = props.params.id;
-  const markdown = `Here is some JavaScript code:
+async function renderEdit(type: "edit" | "new") {
+  return (
+    <>
+      <input placeholder="asasd"></input>
+      <textarea></textarea>
+      <Button title="Apply">Apply</Button>
+    </>
+  );
+}
 
-  \`\`\`html
-  console.log('It 111!')
-  \`\`\`
-  `;
+async function renderView(id: string) {
+  const data = await getArticle(id);
+
+  if (!data) {
+    redirect("/article");
+    return null;
+  }
+
+  const {
+    title,
+    content,
+    create_time,
+    update_time,
+    view_count,
+    types,
+    user_id,
+  } = data;
 
   return (
-    <div className="article-page-root">
-      <h3>title</h3>
+    <>
+      <h3>{title}</h3>
+      <div>
+        <span>Create Time: {create_time}</span>
+        <span>View Count: {view_count}</span>
+        <span>Update Time: {update_time}</span>
+      </div>
       <section>
         <Markdown
           components={{
@@ -31,9 +58,27 @@ export default async function ArticlePage(props: { params: { id: string } }) {
             },
           }}
         >
-          {markdown}
+          {content}
         </Markdown>
       </section>
-    </div>
+    </>
   );
+}
+export default async function ArticlePage(props: {
+  params: { id?: string };
+  searchParams: Record<string, string>;
+}) {
+  const articleID = props.params.id;
+  const type = props.searchParams.type;
+
+  let content = null;
+  if (articleID && type === "edit") {
+    content = await renderEdit("edit");
+  } else if (articleID === "new") {
+    content = await renderEdit("new");
+  } else if (articleID) {
+    content = await renderView(articleID);
+  }
+
+  return <div className={style["article-page-root"]}>{content}</div>;
 }

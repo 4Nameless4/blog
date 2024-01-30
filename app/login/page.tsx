@@ -275,7 +275,7 @@ export default function LoginPage() {
 
   return (
     <section
-      className={`viewbox ${
+      className={`${
         style["login-page-root"]
       } w-full h-full flex justify-center items-center flex-col ${
         active ? style["active"] : ""

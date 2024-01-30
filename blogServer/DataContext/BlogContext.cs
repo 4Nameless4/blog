@@ -7,6 +7,8 @@ namespace blogServer.DataContext
     {
         public DbSet<User> users { get; set; }
         public DbSet<Role> roles { get; set; }
+        public DbSet<Article> articles { get; set; }
+        public DbSet<Article> articleTypes { get; set; }
         public BlogContext(DbContextOptions<BlogContext> options)
         : base(options)
         {

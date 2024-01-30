@@ -85,7 +85,7 @@ function getDescSec(resumeJSON: Record<string, any> | null) {
 
 function renderNotAllowPage() {
   return (
-    <div className="viewbox flex justif-center items-center">Not Allow</div>
+    <div className="flex justif-center items-center">Not Allow</div>
   );
 }
 function renderLoading() {
@@ -161,7 +161,7 @@ export default function ResumePage() {
   }, [resumeFillBlob]);
   function renderPage() {
     return (
-      <article className={`${style["resume-page-root"]} viewbox`}>
+      <article className={`${style["resume-page-root"]}`}>
         {resumeJSON ? getDescSec(resumeJSON) : null}
         <FloatButton
           icon={<UseSVG name="download" />}

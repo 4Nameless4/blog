@@ -117,7 +117,7 @@ export default function ChatRoomPage() {
   }
 
   return (
-    <section className={`${style["chat-room-root"]} w-full h-full viewbox`}>
+    <section className={`${style["chat-room-root"]} w-full h-full`}>
       <div className={style["chat-aside"]}>
         <ul className={style["user-list"]}>{renderUserList(users, me)}</ul>
       </div>

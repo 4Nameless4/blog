@@ -124,7 +124,7 @@ namespace blogServer.Controllers
             sendClientsMsg(setUserListResult());
 
             // ******** open
-            WebSocketReceiveResult receiveResult = null;
+            WebSocketReceiveResult? receiveResult = null;
 
             do {
                 await client.receive(buffer);

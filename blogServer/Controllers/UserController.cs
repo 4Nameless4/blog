@@ -24,9 +24,6 @@ namespace blogServer.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-        // private static string selectUserSql = "select t1.uuid,t1.name,t1.nickname,t1.pwd,t1.email,t1.create_time,t1.role from user as t1";
-        // private static string insertUserSql = "INSERT INTO `blog`.`user` (`id`, `uuid`, `name`, `pwd`, `role`, `nickname`) VALUES ('3', '4', 'asdfg', 'asdfg', '2', 'asdfg');";
-        // private static string selectRoleSql = "select * from permissions as t1";
         public static List<string> tokens = new List<string>();
         private readonly BlogContext blogContext;
         public UserController(BlogContext context)
@@ -48,41 +45,6 @@ namespace blogServer.Controllers
                 return user;
             }
         }
-        //[NonAction]
-        //private User getUserFromDataBase(MySqlDataReader reader)
-        //{
-        //    User user = new User();
-
-        //    if (reader.Read())
-        //    {
-        //        user.uuid = DBHelper.GetValueByColName<long>(reader, "uuid", -1);
-        //        user.name = DBHelper.GetValueByColName(reader, "name", "");
-        //        user.nickname = DBHelper.GetValueByColName(reader, "nickname", "");
-        //        user.pwd = DBHelper.GetValueByColName(reader, "pwd", "");
-        //        user.email = DBHelper.GetValueByColName(reader, "email", "");
-        //        user.createTime = DBHelper.GetValueByColName(reader, "create_time", new DateTime(2000, 1, 1, 00, 00, 00));
-        //        user.role = DBHelper.GetValueByColName(reader, "role", 3);
-        //    }
-        //    return user;
-        //}
-        //[NonAction]
-        //private User getUserByName(string name)
-        //{
-        //    User user = new User() { uuid = -1 };
-        //    try
-        //    {
-        //        using (MySqlConnection con = new MySqlConnection(AppConfiguration.Configuration.GetConnectionString("DefaultConnection")))
-        //        {
-        //            con.Open();
-        //            MySqlCommand comd = new MySqlCommand($"{selectUserSql} where t1.name = \"{name}\"", con);
-        //            var reader = comd.ExecuteReader();
-        //            var datauser = getUserFromDataBase(reader);
-        //            return datauser;
-        //        }
-        //    }
-        //    catch { }
-        //    return user;
-        //}
         // parameter base64: {name:string;pwd:string;nickname:string}
         [HttpPost("signup")]
         public string Signup([FromBody] string base64)
@@ -98,7 +60,6 @@ namespace blogServer.Controllers
                     if (_user != null)
                     {
                         res.msg = "user exist";
-                        return res.encode();
                     }
                     else
                     {
@@ -134,7 +95,6 @@ namespace blogServer.Controllers
                         res.code = "1";
                         dataUser.pwd = "";
                         res.data = dataUser;
-                        return res.encode();
                     }
                     else
                     {

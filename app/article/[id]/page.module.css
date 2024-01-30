@@ -1,0 +1,4 @@
+.article-page-root {
+  display: flex;
+  flex-direction: column;
+}
