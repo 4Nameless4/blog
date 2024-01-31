@@ -1,7 +1,13 @@
-import { t_article, t_article_view, t_result, t_token_user, t_user } from "./types";
+import {
+  t_article,
+  t_article_view,
+  t_result,
+  t_token_user,
+  t_user,
+} from "./types";
 import { aesEncode2base64, base642aesDecode } from "./utils";
 
-export async function request(api: string, data?: string) {
+export async function request(api: string, data: string) {
   const res = await fetch(process.env.SERVER + api, {
     method: "POST",
     mode: "cors",
@@ -9,7 +15,7 @@ export async function request(api: string, data?: string) {
       Accept: "application/json",
       "Content-Type": "application/json;charset=utf-8",
     },
-    body: JSON.stringify(data),
+    body: JSON.stringify(aesEncode2base64(data)),
   });
   return base642aesDecode(await res.json());
 }
@@ -21,13 +27,10 @@ export async function requestGet(api: string) {
   return base642aesDecode(await res.text());
 }
 export async function logout(token: string) {
-  return request("/User/logout", aesEncode2base64(token));
+  return request("/User/logout", token);
 }
 export async function signin(name: string, pwd: string) {
-  const result = await request(
-    "/User/signin",
-    aesEncode2base64(JSON.stringify({ name, pwd }))
-  );
+  const result = await request("/User/signin", JSON.stringify({ name, pwd }));
   let info: false | t_token_user = false;
   const resultJson: t_result<t_token_user> = JSON.parse(result);
   if (resultJson.code === "1") {
@@ -36,7 +39,7 @@ export async function signin(name: string, pwd: string) {
   return info;
 }
 export async function checkUser(token: string) {
-  const result = await request("/User/check", aesEncode2base64(token));
+  const result = await request("/User/check", token);
   let info: false | t_user = false;
   const resultJson: t_result<t_token_user> = JSON.parse(result);
   if (resultJson.code === "1") {
@@ -47,7 +50,7 @@ export async function checkUser(token: string) {
 export async function signup(name: string, pwd: string, nickname: string) {
   const result = await request(
     "/User/signup",
-    aesEncode2base64(JSON.stringify({ name, nickname, pwd }))
+    JSON.stringify({ name, nickname, pwd })
   );
   let info: boolean = false;
   const resultJson: t_result<boolean> = JSON.parse(result);
@@ -73,4 +76,31 @@ export async function getArticle(id: string) {
     info = resultJson.data;
   }
   return info;
+}
+export async function getArticleList() {
+  const result = await requestGet(`/Article/getAll`);
+
+  let info: false | t_article_view[] = false;
+  const resultJson: t_result<t_article_view[]> = JSON.parse(result);
+  if (resultJson.code === "1") {
+    info = resultJson.data;
+  }
+  return info;
+}
+export async function createArticle(
+  article: Omit<t_article, "id" | "create_time" | "update_time" | "view_count">
+) {
+  const result = await request(`/Article/create`, JSON.stringify(article));
+
+  let info: false | t_article_view[] = false;
+  const resultJson: t_result<t_article_view[]> = JSON.parse(result);
+  if (resultJson.code === "1") {
+    info = resultJson.data;
+  }
+  return info;
+}
+export async function updateArticle(
+  article: Omit<t_article, "create_time" | "update_time" | "view_count">
+) {
+  
 }

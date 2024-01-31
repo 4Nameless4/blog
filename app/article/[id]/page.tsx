@@ -4,17 +4,7 @@ import Markdown from "react-markdown";
 import { Prism } from "react-syntax-highlighter";
 import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { getArticle } from "@/common/api";
-import Button from "antd/es/button";
-
-async function renderEdit(type: "edit" | "new") {
-  return (
-    <>
-      <input placeholder="asasd"></input>
-      <textarea></textarea>
-      <Button title="Apply">Apply</Button>
-    </>
-  );
-}
+import EditPage from "./editPage";
 
 async function renderView(id: string) {
   const data = await getArticle(id);
@@ -73,9 +63,9 @@ export default async function ArticlePage(props: {
 
   let content = null;
   if (articleID && type === "edit") {
-    content = await renderEdit("edit");
+    content = <EditPage type="edit" />;
   } else if (articleID === "new") {
-    content = await renderEdit("new");
+    content = <EditPage type="new" />;
   } else if (articleID) {
     content = await renderView(articleID);
   }
