@@ -10,7 +10,11 @@ function renderActicleList(list: t_article_view[] | null | false | undefined) {
     const itemClass = style["item"];
     return list.map((d) => {
       return (
-        <div key={d.id + d.user_id} className={itemClass}>
+        <Link
+          key={d.id + d.user_id}
+          className={itemClass}
+          href={`/article/${d.id}`}
+        >
           <span>{d.title}</span>
           <p>{d.content}</p>
           <div>
@@ -18,7 +22,7 @@ function renderActicleList(list: t_article_view[] | null | false | undefined) {
             <span>{d.user.nickname}</span>
             <span>{d.view_count}</span>
           </div>
-        </div>
+        </Link>
       );
     });
   }

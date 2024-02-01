@@ -102,5 +102,28 @@ export async function createArticle(
 export async function updateArticle(
   article: Omit<t_article, "create_time" | "update_time" | "view_count">
 ) {
-  
+  const result = await request(`/Article/update`, JSON.stringify(article));
+
+  let info: false | t_article_view[] = false;
+  const resultJson: t_result<t_article_view[]> = JSON.parse(result);
+  if (resultJson.code === "1") {
+    info = resultJson.data;
+  }
+  return info;
+}
+export async function deleteArticle(articleID: string, userToken: string) {
+  const result = await request(
+    `/Article/delete`,
+    JSON.stringify({
+      articleID,
+      userToken,
+    })
+  );
+
+  let info: boolean = false;
+  const resultJson: t_result<boolean> = JSON.parse(result);
+  if (resultJson.code === "1") {
+    info = resultJson.data;
+  }
+  return info;
 }

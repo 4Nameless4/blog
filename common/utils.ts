@@ -45,7 +45,7 @@ export function base64ToString(base64: string) {
   return binString;
 }
 
-export async function getUser(): Promise<t_user | false> {
+export async function getUser(): Promise<t_token_user | false> {
   const user = getLocalUser();
   let info: t_token_user | false = false;
   if (user) {

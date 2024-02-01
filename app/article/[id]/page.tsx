@@ -55,19 +55,25 @@ async function renderView(id: string) {
   );
 }
 export default async function ArticlePage(props: {
-  params: { id?: string };
+  params: { id: string };
   searchParams: Record<string, string>;
 }) {
   const articleID = props.params.id;
   const type = props.searchParams.type;
 
   let content = null;
-  if (articleID && type === "edit") {
-    content = <EditPage type="edit" />;
-  } else if (articleID === "new") {
-    content = <EditPage type="new" />;
-  } else if (articleID) {
-    content = await renderView(articleID);
+
+  if (articleID === "new") {
+    content = <EditPage />;
+  } else {
+    const article = await getArticle(articleID);
+    if (article) {
+      if (type === "edit") {
+        content = <EditPage article={article} />;
+      } else if (articleID) {
+        content = await renderView(articleID);
+      }
+    }
   }
 
   return <div className={style["article-page-root"]}>{content}</div>;

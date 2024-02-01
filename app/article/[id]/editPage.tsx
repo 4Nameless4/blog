@@ -1,15 +1,16 @@
 "use client";
-import { createArticle } from "@/common/api";
+import { createArticle, deleteArticle, updateArticle } from "@/common/api";
 import { getUser } from "@/common/utils";
 import Button from "antd/es/button";
 import style from "./page.module.css";
 import { useEffect, useRef, useState } from "react";
-import { t_user } from "@/common/types";
+import { t_article, t_article_view, t_token_user } from "@/common/types";
 import { useRouter } from "next/navigation";
 
-export default function EditPage(props: { type: "edit" | "new" }) {
-  const type = props.type;
-  const [user, setUser] = useState<t_user | null>(null);
+export default function EditPage(props: { article?: t_article_view }) {
+  const article = props.article;
+  const type = article ? "edit" : "new";
+  const [user, setUser] = useState<t_token_user | null>(null);
   const form = useRef(null);
   const router = useRouter();
 
@@ -21,11 +22,15 @@ export default function EditPage(props: { type: "edit" | "new" }) {
       }
       setUser(d);
     });
-  }, []);
+  }, [router]);
 
-  function getFormData() {
+  function getFormData(): Omit<
+    t_article,
+    "view_count" | "create_time" | "update_time"
+  > {
     const data = new FormData(form.current || undefined);
     return {
+      id: "",
       title: data.get("title") as string,
       content: data.get("content") as string,
       types: data.get("types")?.toString() || "",
@@ -65,19 +70,37 @@ export default function EditPage(props: { type: "edit" | "new" }) {
           onClick={async () => {
             if (!user) return;
 
-            const data = getFormData();
-            data.user_id = user.uuid;
-            if (type === "edit") {
+            const formData = getFormData();
+            formData.user_id = user.uuid;
+            if (article) {
               // todo
-            } else if (type === "new") {
+              formData.id = article.id;
+              updateArticle(formData);
+            } else {
               // todo
-              createArticle(data);
+              createArticle(formData);
             }
           }}
         >
           Apply
-        </Button>
-        {type === "edit" ? <Button title="Cancle">Cancle</Button> : null}
+        </Button>{" "}
+        {type === "edit" ? (
+          <>
+            <Button
+              title="Delete"
+              onClick={async () => {
+                if (!user || !article) return;
+
+                const data = getFormData();
+                data.user_id = user.uuid;
+                deleteArticle(article?.id, user.token);
+              }}
+            >
+              Apply
+            </Button>
+            <Button title="Cancle">Cancle</Button>
+          </>
+        ) : null}
       </div>
     </form>
   );
