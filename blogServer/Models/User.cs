@@ -20,6 +20,18 @@ namespace blogServer.Models
         [Column("email")]
         public string? email { get; set; } = "";
         [Column("create_time")]
-        public DateTime? createTime { get; set; } = DateTime.Now;
+        public DateTime? createTime { get; set; } = DateTime.UtcNow;
+        public IDictionary<string, object> ToDictionary()
+        {
+            var result = new Dictionary<string, object>();
+            result.Add("uuid", this.uuid);
+            result.Add("name", this.name);
+            result.Add("nickname", this.nickname);
+            result.Add("pwd", this.pwd);
+            result.Add("role", this.role);
+            result.Add("email", this.email ?? "");
+            result.Add("createTime", (this.createTime ?? DateTime.UtcNow).ToString());
+            return result;
+        }
     }
 }

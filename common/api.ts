@@ -1,5 +1,7 @@
+// "use client"
 import {
   t_article,
+  t_article_type,
   t_article_view,
   t_result,
   t_token_user,
@@ -88,19 +90,19 @@ export async function getArticleList() {
   return info;
 }
 export async function createArticle(
-  article: Omit<t_article, "id" | "create_time" | "update_time" | "view_count">
+  article: Omit<t_article, "id" | "createTime" | "updateTime" | "viewCount">
 ) {
   const result = await request(`/Article/create`, JSON.stringify(article));
 
-  let info: false | t_article_view[] = false;
-  const resultJson: t_result<t_article_view[]> = JSON.parse(result);
+  let info: false | t_article_view = false;
+  const resultJson: t_result<t_article_view> = JSON.parse(result);
   if (resultJson.code === "1") {
     info = resultJson.data;
   }
   return info;
 }
 export async function updateArticle(
-  article: Omit<t_article, "create_time" | "update_time" | "view_count">
+  article: Omit<t_article, "createTime" | "updateTime" | "viewCount">
 ) {
   const result = await request(`/Article/update`, JSON.stringify(article));
 
@@ -122,6 +124,16 @@ export async function deleteArticle(articleID: string, userToken: string) {
 
   let info: boolean = false;
   const resultJson: t_result<boolean> = JSON.parse(result);
+  if (resultJson.code === "1") {
+    info = resultJson.data;
+  }
+  return info;
+}
+export async function getArticleTypes() {
+  const result = await requestGet(`/Article/types`);
+
+  let info: t_article_type | false = false;
+  const resultJson: t_result<t_article_type> = JSON.parse(result);
   if (resultJson.code === "1") {
     info = resultJson.data;
   }

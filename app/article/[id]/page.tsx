@@ -17,20 +17,20 @@ async function renderView(id: string) {
   const {
     title,
     content,
-    create_time,
-    update_time,
-    view_count,
+    createTime,
+    updateTime,
+    viewCount,
     types,
-    user_id,
+    userID,
   } = data;
 
   return (
     <>
       <h3>{title}</h3>
       <div>
-        <span>Create Time: {create_time}</span>
-        <span>View Count: {view_count}</span>
-        <span>Update Time: {update_time}</span>
+        <span>Create Time: {new Date(`${createTime} UTC`).toLocaleString()}</span>
+        <span>View Count: {viewCount}</span>
+        <span>Update Time: {new Date(`${updateTime} UTC`).toLocaleString()}</span>
       </div>
       <section>
         <Markdown

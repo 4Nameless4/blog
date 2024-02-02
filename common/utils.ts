@@ -69,3 +69,19 @@ export function fetchJSON(path: string, data: any, options: RequestInit) {
     ...options,
   }).then((d) => d.json());
 }
+
+export function formatZeroToLeft(num: number, length: number = 2) {
+  let str = `${num}`;
+
+  for (let i = 0; i < length - str.length; i++) {
+    str = "0" + str;
+  }
+
+  return str;
+}
+
+export function formatDate(date: Date, isHour: boolean = false) {
+  let month = formatZeroToLeft(date.getMonth() + 1);
+  let day = formatZeroToLeft(date.getDate());
+  return `${date.getFullYear()}/${month}/${day}`;
+}

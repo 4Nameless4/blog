@@ -163,6 +163,9 @@ export default function LoginPage() {
             <span className={style["user-uuid"]}>UUID: {user.uuid}</span>
             <span className={style["user-name"]}>Account: {user.name}</span>
             <span className={style["user-role"]}>Level: {user.role}</span>
+            <span className={style["user-create-time"]}>
+              CreateTime: {new Date(`${user.createTime} UTC`).toLocaleString()}
+            </span>
           </div>
         </div>
 

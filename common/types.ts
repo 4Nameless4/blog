@@ -4,6 +4,7 @@ export type t_user = {
   nickname: string;
   role: number; // admin user
   email?: string;
+  createTime: number;
 };
 
 export type t_token_user = t_user & { token: string };
@@ -18,16 +19,16 @@ export type t_article = {
   id: string;
   title: string;
   content: string;
-  create_time: number;
-  update_time: number;
-  user_id: string;
-  view_count: number;
+  createTime: number;
+  updateTime: number;
+  userID: string;
+  viewCount: number;
   types: string;
 };
 
 export type t_article_type = {
-  id: string,
-  name: string
+  id: string;
+  name: string;
 };
 
 export type t_article_view = t_article & {

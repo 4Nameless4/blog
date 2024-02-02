@@ -1,5 +1,79 @@
-.article-overview-page-root {}
+.article-overview-page-root {
+  width: 100%;
 
-.grid-container {}
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
 
-.item {}
+  min-height: 100%;
+}
+
+.overview-top-bar {
+  text-align: center;
+}
+
+.overview-title {
+}
+
+.overview-btn {
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 14em);
+  grid-template-rows: repeat(auto-fill, 10em);
+  gap: 0.25em;
+
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item {
+  text-decoration: none;
+  color: inherit;
+  font-style: inherit;
+  font-weight: inherit;
+
+  border: 1px solid #000;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.125em;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.125em;
+  border-radius: 3px;
+  box-sizing: border-box;
+}
+
+.item-new {
+  justify-content: center;
+  border: none;
+}
+
+.new-btn {
+  width: 5em;
+  height: 5em;
+  border-radius: 50%;
+}
+
+.new-btn-icon {
+}
+
+.item-title {
+}
+
+.item-content {
+  height: 3em;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.item-info {
+  display: flex;
+  justify-content: space-between;
+}

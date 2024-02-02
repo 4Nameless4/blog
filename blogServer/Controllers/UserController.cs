@@ -122,11 +122,12 @@ namespace blogServer.Controllers
                 var _user = blogContext.users.Single((b) => b.name == data_user.name && b.pwd == data_user.pwd);
                 if (_user != null)
                 {
-                    var userStore = new Dictionary<string, object>() { { "name", _user.name }, { "nickname", _user.nickname }, { "role", _user.role }, { "uuid", _user.uuid.ToString() } };
-                    var token = TokenHelper.CreateJwtToken(userStore);
-                    res.code = "1";
+
                     _user.pwd = "";
-                    res.data = new Dictionary<string, object>() { { "token", token }, { "uuid", _user.uuid }, { "name", _user.name }, { "nickname", _user.nickname }, { "email", _user.email ?? "" }, { "role", _user.role }, { "createTime", _user.createTime ?? new DateTime(2000,1,1,0,0,0) } };
+                    var user = _user.ToDictionary();
+                    var token = TokenHelper.CreateJwtToken(user);
+                    res.code = "1";
+                    res.data = user;
 
                     var oldToken = tokens.Find(d =>
                     {
