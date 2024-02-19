@@ -110,6 +110,7 @@ export default function ResumePage() {
   useEffect(() => {
     getUser()
       .then((d) => {
+        // todo
         if (!d || d.role !== 1) {
           router.replace("/login");
           setLoading(false);

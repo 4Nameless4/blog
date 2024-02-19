@@ -2,6 +2,10 @@
   display: grid;
   grid-template-columns: minmax(5rem, 10rem) 3fr;
   grid-template-rows: 1fr;
+  --user-back-color-me: lightblue;
+  --user-back-color: rgb(255, 193, 59);
+  --msgbox-back-color-me: lightblue;
+  --msgbox-back-color: rgb(255, 193, 59);
 }
 
 .user-list li {
@@ -10,10 +14,12 @@
 
 .user-item {
   margin: 1rem;
+  background-color: var(--user-back-color);
 }
 
 .user-item.me {
-  border: 1px solid red;
+  border-radius: 5px;
+  background-color: var(--user-back-color-me);
 }
 
 .msg-list {
