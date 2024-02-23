@@ -6,6 +6,9 @@
   gap: 1em;
 
   min-height: 100%;
+
+  --article-item-color: #d7ceba;
+  --article-item-color-highlight: #fec273;
 }
 
 .overview-top-bar {
@@ -34,7 +37,6 @@
   font-style: inherit;
   font-weight: inherit;
 
-  border: 1px solid #000;
   width: 100%;
   height: 100%;
   display: flex;
@@ -42,9 +44,18 @@
   gap: 0.125em;
   justify-content: space-between;
   align-items: center;
-  padding: 0.125em;
+  padding: 0.25em;
   border-radius: 3px;
   box-sizing: border-box;
+
+  background-color: var(--article-item-color);
+
+  transition: scale 0.3s ease, background-color 0.5s linear;
+}
+
+.item:hover {
+  scale: 1.1;
+  background-color: var(--article-item-color-highlight);
 }
 
 .item-new {
@@ -65,7 +76,6 @@
 }
 
 .item-content {
-  height: 3em;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
@@ -76,4 +86,13 @@
 .item-info {
   display: flex;
   justify-content: space-between;
+  width: 100%;
+  gap: 0.25em;
+}
+
+.item-info > span {
+  max-width: 50%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-wrap: nowrap;
 }
