@@ -6,6 +6,9 @@ let {
   server_production,
   staticResourceServer,
   staticResourceServer_production,
+  key1,
+  key2,
+  iv,
 } = process.env;
 
 function getIpAddress() {
@@ -40,6 +43,9 @@ const nextConfig = {
       NODE_ENV === "development"
         ? staticResourceServer
         : staticResourceServer_production,
+    key1,
+    key2,
+    iv,
   },
 };
 

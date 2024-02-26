@@ -1,13 +1,14 @@
+// "use server"
 import { AES, enc, mode, pad } from "crypto-js";
 import type { lib } from "crypto-js";
 import { clearLocalUser, getLocalUser, setLocalUser } from "./user";
 import { t_token_user, t_user } from "./types";
 
-const key1 = enc.Utf8.parse("|a2wemzw2/d-e1=2");
-const key2 = "rrSbMerwLYgfq9Hvtgwk8wlCLSWbkKMvf4mEOmhC8SA=";
-const iv = enc.Utf8.parse("089dg|1*h19a//a*");
-
+const key1 = enc.Utf8.parse(process.env.key1 || "");
+const key2 = process.env.key1 || "";
+const iv = enc.Utf8.parse(process.env.iv || "");
 function encode(data: string | lib.WordArray, key: string | lib.WordArray) {
+  debugger
   return AES.encrypt(data, key, {
     iv: iv,
     mode: mode.CBC,
