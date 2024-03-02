@@ -17,7 +17,7 @@ function linkWebsocketServer(props: string = "") {
   const server = process.env.SERVER || "http://localhost:14513";
   let wsUrl = "";
   const scheme = document.location.protocol === "https:" ? "wss" : "ws";
-  wsUrl = server.replace(/https?:/, scheme + ":") + "/chatroom/ws";
+  wsUrl = server.replace(/https?:/, scheme + ":") + "/Websocket/link";
 
   const ws = new WebSocket(wsUrl + props);
   return ws;

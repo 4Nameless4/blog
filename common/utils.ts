@@ -1,14 +1,13 @@
-// "use server"
+// "use client"
 import { AES, enc, mode, pad } from "crypto-js";
 import type { lib } from "crypto-js";
 import { clearLocalUser, getLocalUser, setLocalUser } from "./user";
 import { t_token_user, t_user } from "./types";
 
 const key1 = enc.Utf8.parse(process.env.key1 || "");
-const key2 = process.env.key1 || "";
+const key2 = process.env.key2 || "";
 const iv = enc.Utf8.parse(process.env.iv || "");
 function encode(data: string | lib.WordArray, key: string | lib.WordArray) {
-  debugger
   return AES.encrypt(data, key, {
     iv: iv,
     mode: mode.CBC,

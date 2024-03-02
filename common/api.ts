@@ -19,14 +19,16 @@ export async function request(api: string, data: string) {
     },
     body: JSON.stringify(aesEncode2base64(data)),
   });
-  return base642aesDecode(await res.json());
+  const json = await res.json();
+  return base642aesDecode(json);
 }
 export async function requestGet(api: string) {
   const res = await fetch(process.env.SERVER + api, {
     method: "GET",
     mode: "cors",
   });
-  return base642aesDecode(await res.text());
+  const text = await res.text();
+  return base642aesDecode(text);
 }
 export async function logout(token: string) {
   return request("/User/logout", token);

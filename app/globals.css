@@ -23,3 +23,7 @@ body > main > * {
     max-width: 1200px;
   }
 }
+
+button {
+  cursor: pointer;
+}

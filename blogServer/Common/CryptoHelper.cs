@@ -15,8 +15,8 @@ namespace blogServer.Common
         static CryptoHelper()
         {
             var appConfig = AppConfiguration.Configuration;
-            key = appConfig.GetValue<string>("api:key") ?? "a2hk3we*4/9d+a5-";
-            iv = appConfig.GetValue<string>("api:iv") ?? "089dg|1*h19a//a*";
+            key = appConfig.GetValue<string>("api:key") ?? "";
+            iv = appConfig.GetValue<string>("api:iv") ?? "";
             keyBytes = Encoding.UTF8.GetBytes(key);
             ivBytes = Encoding.UTF8.GetBytes(iv);
         }

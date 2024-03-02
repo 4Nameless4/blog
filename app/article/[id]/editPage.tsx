@@ -7,7 +7,7 @@ import {
 } from "@/common/api";
 import { getUser } from "@/common/utils";
 import Button from "antd/es/button";
-import style from "./page.module.css";
+import style from "./editPage.module.css";
 import { useEffect, useRef, useState } from "react";
 import { t_article, t_article_view, t_token_user } from "@/common/types";
 import { useRouter } from "next/navigation";

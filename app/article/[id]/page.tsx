@@ -5,6 +5,10 @@ import { Prism } from "react-syntax-highlighter";
 import { dark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { getArticle } from "@/common/api";
 import EditPage from "./editPage";
+import Link from "next/link";
+import { EditOutlined } from "@ant-design/icons";
+import Button from "antd/es/button";
+import { TextSpan } from "@/components/TextSpan";
 
 async function renderView(id: string) {
   const data = await getArticle(id);
@@ -14,25 +18,35 @@ async function renderView(id: string) {
     return null;
   }
 
-  const {
-    title,
-    content,
-    createTime,
-    updateTime,
-    viewCount,
-    types,
-    userID,
-  } = data;
+  const { title, content, createTime, updateTime, viewCount, types, userID } =
+    data;
+
+  const edit = (
+    <Button shape="circle">
+      <Link href="?type=edit">
+        <EditOutlined />
+      </Link>
+    </Button>
+  );
 
   return (
     <>
-      <h3>{title}</h3>
-      <div>
-        <span>Create Time: {new Date(`${createTime} UTC`).toLocaleString()}</span>
-        <span>View Count: {viewCount}</span>
-        <span>Update Time: {new Date(`${updateTime} UTC`).toLocaleString()}</span>
+      <div className={style["title-view"]}>
+        <h3>
+          <TextSpan str={title}/>
+        </h3>
+        {edit}
       </div>
-      <section>
+      <div className={style["meta-view"]}>
+        <span>
+          Create Time: {new Date(`${createTime} UTC`).toLocaleString()}
+        </span>
+        <span>View Count: {viewCount}</span>
+        <span>
+          Update Time: {new Date(`${updateTime} UTC`).toLocaleString()}
+        </span>
+      </div>
+      <section className={style["content-view"]}>
         <Markdown
           components={{
             code(props) {

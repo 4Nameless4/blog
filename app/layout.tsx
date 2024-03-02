@@ -18,7 +18,7 @@ export default function RootLayout({
         <header className="contents">
           <Menu />
         </header>
-        <main className="grid p-24 flex-1 overflow-hidden z-0">{children}</main>
+        <main className="grid p-24 flex-1 z-0">{children}</main>
       </body>
     </html>
   );

@@ -13,6 +13,7 @@ using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Runtime.Intrinsics.X86;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,8 +21,8 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace blogServer.Controllers
 {
-    [ApiController]
     [Route("[controller]")]
+    [ApiController]
     public class WebsocketController : ControllerBase
     {
         private readonly BlogContext blogContext;
@@ -30,12 +31,16 @@ namespace blogServer.Controllers
         {
             blogContext = context;
         }
-        [Route("/chatroom/ws")]
-        public async Task Get(long uuid)
+        [HttpGet("link")]
+        public async Task _Get(string uuid)
         {
             if (HttpContext.WebSockets.IsWebSocketRequest)
             {
                 using var webSocket = await HttpContext.WebSockets.AcceptWebSocketAsync();
+                if (uuid.Trim() == "")
+                {
+                    uuid = Guid.NewGuid().ToString() + "_temp";
+                }
                 await Echo(webSocket, uuid);
             }
             else
@@ -106,11 +111,12 @@ namespace blogServer.Controllers
             }
             return result;
         }
-        private async Task Echo(WebSocket webSocket, long uuid)
+        [NonAction]
+        private async Task Echo(WebSocket webSocket, string uuid)
         {
             // ******** open
             var buffer = new byte[1024 * 4];
-            var open_user = blogContext.users.SingleOrDefault((b) => b.uuid == uuid);
+            var open_user = blogContext.users.SingleOrDefault((b) => b.uuid == long.Parse(uuid));
             if (open_user == null)
             {
                 return;
@@ -123,7 +129,7 @@ namespace blogServer.Controllers
             }
             sendClientsMsg(setUserListResult());
 
-            // ******** open
+            // ******** connect send msg
             WebSocketReceiveResult? receiveResult = null;
 
             do {
@@ -153,6 +159,7 @@ namespace blogServer.Controllers
             }
             while (!receiveResult.CloseStatus.HasValue);
 
+            // ******** close
             clients.Remove(client);
             sendClientsMsg(setUserListResult());
             await webSocket.CloseAsync(
