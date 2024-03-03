@@ -1,13 +1,15 @@
 "use client";
 import { FloatButton, Modal, Spin } from "antd";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useContext, useEffect, useMemo, useRef, useState } from "react";
 import Pizzip from "pizzip";
 import DocxTemplater from "docxtemplater";
 import { saveAs } from "file-saver";
 import UseSVG from "../../components/usesvg";
 import style from "./page.module.css";
-import { getUser } from "@/common/utils";
 import { useRouter } from "next/navigation";
+import { UserContext } from "@/common/context";
+import { getResume } from "@/common/api";
+import { useLoading, useUser } from "@/common/hooks";
 
 function fillResumeTemplate(arraybuffer: ArrayBuffer, json: any) {
   const zip = new Pizzip(arraybuffer);
@@ -83,56 +85,26 @@ function getDescSec(resumeJSON: Record<string, any> | null) {
   );
 }
 
-function renderNotAllowPage() {
-  return (
-    <div className="flex justif-center items-center">Not Allow</div>
-  );
-}
-function renderLoading() {
-  return (
-    <div className="flex justify-center items-center">
-      <Spin />
-    </div>
-  );
-}
-
 export default function ResumePage() {
-  const router = useRouter();
-  const [allow, setAllow] = useState(false);
+  const user = useContext(UserContext);
   const resume = useRef<HTMLElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [resumeFillBlob, setResumeFillBlob] = useState<null | Blob>(null);
   const [resumeJSON, setResumeJSON] = useState<null | Record<string, any>>(
     null
   );
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getUser()
-      .then((d) => {
-        // todo
-        if (!d || d.role !== 1) {
-          router.replace("/login");
-          setLoading(false);
-          setAllow(false);
-          return Promise.reject();
-        }
-        setAllow(true);
-      })
-      .then(() => fetch("/resume/api"))
-      .then((d) => d.json())
-      .then(({ data }) => {
-        if (!data) return;
-        const { json, blobArray } = data;
-        const buffer = new Int8Array(blobArray);
+    if (user) {
+      getResume().then(([json, arrayBuffer]) => {
         setResumeJSON(json);
-        const fillBlob = fillResumeTemplate(buffer.buffer, json);
+        const fillBlob = fillResumeTemplate(arrayBuffer, json);
         setResumeFillBlob(fillBlob);
-        setLoading(false);
       });
-  }, [router]);
+    }
+  }, [user]);
+
   useEffect(() => {
-    if (!allow) return;
     try {
       const el = resume.current;
       if (!isModalOpen || !el || !resumeFillBlob) return;
@@ -143,9 +115,9 @@ export default function ResumePage() {
     } catch (e) {
       console.error(e);
     }
-  }, [isModalOpen, resumeFillBlob, allow]);
+  }, [isModalOpen, resumeFillBlob]);
   function _download() {
-    if (!resumeFillBlob || !allow) return;
+    if (!resumeFillBlob) return;
     saveAs(resumeFillBlob, "resume.docx");
   }
   const dialogContent = useMemo(() => {
@@ -186,9 +158,5 @@ export default function ResumePage() {
       </article>
     );
   }
-  return loading
-    ? renderLoading()
-    : allow
-    ? renderPage()
-    : renderNotAllowPage();
+  return useLoading(renderPage, !!resumeJSON);
 }

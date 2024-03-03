@@ -1,4 +1,3 @@
-// "use client"
 import {
   t_article,
   t_article_type,
@@ -7,35 +6,14 @@ import {
   t_token_user,
   t_user,
 } from "./types";
-import { aesEncode2base64, base642aesDecode } from "./utils";
+import { clearLocalUser, getUserToken, request, requestGet, setLocalUser } from "./utils";
 
-export async function request(api: string, data: string) {
-  const res = await fetch(process.env.SERVER + api, {
-    method: "POST",
-    mode: "cors",
-    headers: {
-      Accept: "application/json",
-      "Content-Type": "application/json;charset=utf-8",
-    },
-    body: JSON.stringify(aesEncode2base64(data)),
-  });
-  const json = await res.json();
-  return base642aesDecode(json);
-}
-export async function requestGet(api: string) {
-  const res = await fetch(process.env.SERVER + api, {
-    method: "GET",
-    mode: "cors",
-  });
-  const text = await res.text();
-  return base642aesDecode(text);
-}
 export async function logout(token: string) {
   return request("/User/logout", token);
 }
 export async function signin(name: string, pwd: string) {
   const result = await request("/User/signin", JSON.stringify({ name, pwd }));
-  let info: false | t_token_user = false;
+  let info: null | t_token_user = null;
   const resultJson: t_result<t_token_user> = JSON.parse(result);
   if (resultJson.code === "1") {
     info = resultJson.data;
@@ -44,7 +22,7 @@ export async function signin(name: string, pwd: string) {
 }
 export async function checkUser(token: string) {
   const result = await request("/User/check", token);
-  let info: false | t_user = false;
+  let info: null | t_user = null;
   const resultJson: t_result<t_token_user> = JSON.parse(result);
   if (resultJson.code === "1") {
     info = resultJson.data;
@@ -64,17 +42,17 @@ export async function signup(name: string, pwd: string, nickname: string) {
   return info;
 }
 export async function getResume() {
-  return await Promise.all([
-    fetch(process.env.StaticSERVER + "/resumeinfo").then((r) => r.text()),
-    fetch(process.env.StaticSERVER + "/resumeTemplate.docx").then((r) =>
-      r.blob()
-    ),
+  return Promise.all([
+    fetch(process.env.StaticSERVER + "/resumeinfo").then((r) => r.json()),
+    fetch(process.env.StaticSERVER + "/resumeTemplate.docx")
+      .then((r) => r.blob())
+      .then((r) => r.arrayBuffer()),
   ]);
 }
 export async function getArticle(id: string) {
   const result = await requestGet(`/Article/get?id=${id}`);
 
-  let info: false | t_article_view = false;
+  let info: null | t_article_view = null;
   const resultJson: t_result<t_article_view> = JSON.parse(result);
   if (resultJson.code === "1") {
     info = resultJson.data;
@@ -84,7 +62,7 @@ export async function getArticle(id: string) {
 export async function getArticleList() {
   const result = await requestGet(`/Article/getAll`);
 
-  let info: false | t_article_view[] = false;
+  let info: null | t_article_view[] = null;
   const resultJson: t_result<t_article_view[]> = JSON.parse(result);
   if (resultJson.code === "1") {
     info = resultJson.data;
@@ -96,7 +74,7 @@ export async function createArticle(
 ) {
   const result = await request(`/Article/create`, JSON.stringify(article));
 
-  let info: false | t_article_view = false;
+  let info: null | t_article_view = null;
   const resultJson: t_result<t_article_view> = JSON.parse(result);
   if (resultJson.code === "1") {
     info = resultJson.data;
@@ -108,7 +86,7 @@ export async function updateArticle(
 ) {
   const result = await request(`/Article/update`, JSON.stringify(article));
 
-  let info: false | t_article_view[] = false;
+  let info: null | t_article_view[] = null;
   const resultJson: t_result<t_article_view[]> = JSON.parse(result);
   if (resultJson.code === "1") {
     info = resultJson.data;
@@ -134,10 +112,24 @@ export async function deleteArticle(articleID: string, userToken: string) {
 export async function getArticleTypes() {
   const result = await requestGet(`/Article/types`);
 
-  let info: t_article_type | false = false;
+  let info: t_article_type | null = null;
   const resultJson: t_result<t_article_type> = JSON.parse(result);
   if (resultJson.code === "1") {
     info = resultJson.data;
   }
   return info;
 }
+
+export async function getUser(): Promise<t_token_user | null> {
+  const token = getUserToken();
+  let info: t_token_user | null = null;
+  if (token) {
+    const info = await checkUser(token);
+    info && setLocalUser(info, token);
+  }
+  if (!info) {
+    clearLocalUser();
+  }
+  return info;
+}
+

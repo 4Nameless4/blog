@@ -2,39 +2,19 @@
 import {
   createArticle,
   deleteArticle,
-  getArticleTypes,
   updateArticle,
 } from "@/common/api";
-import { getUser } from "@/common/utils";
 import Button from "antd/es/button";
 import style from "./editPage.module.css";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { t_article, t_article_view, t_token_user } from "@/common/types";
 import { useRouter } from "next/navigation";
 
 export default function EditPage(props: { article?: t_article_view }) {
   const article = props.article;
   const type = article ? "edit" : "new";
-  const [user, setUser] = useState<t_token_user | null>(null);
-  const [types, setTypes] = useState<t_token_user | null>(null);
   const form = useRef(null);
   const router = useRouter();
-
-  useEffect(() => {
-    getUser().then((user) => {
-      if (!user) {
-        router.replace("/login");
-        return Promise.reject();
-      }
-      setUser(user);
-      // return getArticleTypes().then((d) => [user, d] as const);
-    });
-    // .then(([user, d]) => {
-    //   setUser(user);
-    //   // setTypes(d);
-    //   console.log(d);
-    // });
-  }, [router]);
 
   function getFormData(): Omit<
     t_article,

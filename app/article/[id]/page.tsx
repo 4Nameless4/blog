@@ -8,7 +8,7 @@ import EditPage from "./editPage";
 import Link from "next/link";
 import { EditOutlined } from "@ant-design/icons";
 import Button from "antd/es/button";
-import { TextSpan } from "@/components/TextSpan";
+import { TextTitle } from "@/components/text_title";
 
 async function renderView(id: string) {
   const data = await getArticle(id);
@@ -33,7 +33,7 @@ async function renderView(id: string) {
     <>
       <div className={style["title-view"]}>
         <h3>
-          <TextSpan str={title}/>
+          <TextTitle str={title}/>
         </h3>
         {edit}
       </div>

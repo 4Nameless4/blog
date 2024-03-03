@@ -1,10 +1,10 @@
 "use client";
 import style from "./page.module.css";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { t_result, t_user } from "@/common/types";
-import { getUser } from "@/common/utils";
 import { useRouter } from "next/navigation";
 import { aesEncode2base64, base642aesDecode } from "@/common/utils";
+import { UserContext } from "@/common/context";
 
 interface t_msg {
   time: string;
@@ -23,7 +23,7 @@ function linkWebsocketServer(props: string = "") {
   return ws;
 }
 
-function renderUserList(users: t_user[], me: t_user | null) {
+function renderUserList(users: t_user[], me: t_user | null | false) {
   return users.map((d) => {
     let className = style["user-item"];
     if (me && d.uuid === me.uuid) {
@@ -37,7 +37,7 @@ function renderUserList(users: t_user[], me: t_user | null) {
   });
 }
 
-function renderMSGList(messages: t_msg[], me: t_user | null) {
+function renderMSGList(messages: t_msg[], me: t_user | null | false) {
   const msgList = messages.map((d) => {
     let className = style["msg-item"];
     if (me && d.user.uuid === me.uuid) {
@@ -56,56 +56,50 @@ function renderMSGList(messages: t_msg[], me: t_user | null) {
 }
 
 export default function ChatRoomPage() {
-  const router = useRouter();
-  const [me, setMe] = useState<null | t_user>(null);
+  const user = useContext(UserContext);
+  // const [me, setMe] = useState<null | t_user>(null);
   const [users, setUsers] = useState<t_user[]>([]);
   const [messages, setMsg] = useState<t_msg[]>([]);
   const [ws, setWs] = useState<WebSocket | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
+    if (!user) return;
     let ws: WebSocket;
-    getUser().then((d) => {
-      if (!d) {
-        router.replace("/login");
-        return;
+
+    ws = linkWebsocketServer(`?uuid=${user.uuid}`);
+    ws.addEventListener("message", (event) => {
+      const value = base642aesDecode(event.data);
+      const result: t_result<unknown> = JSON.parse(value);
+
+      if (result.code === "1") {
+        const data = result.data as t_msg;
+        setMsg((msg) => {
+          const newMsg = msg.slice(0);
+          newMsg.push(data);
+          return newMsg;
+        });
+      } else if (result.code === "2") {
+        const data = result.data as t_user[];
+        setUsers(data);
+      } else {
+        console.error("Unknown message type");
       }
-
-      setMe(d);
-      ws = linkWebsocketServer(`?uuid=${d.uuid}`);
-      ws.addEventListener("message", (event) => {
-        const value = base642aesDecode(event.data);
-        const result: t_result<unknown> = JSON.parse(value);
-
-        if (result.code === "1") {
-          const data = result.data as t_msg;
-          setMsg((msg) => {
-            const newMsg = msg.slice(0);
-            newMsg.push(data);
-            return newMsg;
-          });
-        } else if (result.code === "2") {
-          const data = result.data as t_user[];
-          setUsers(data);
-        } else {
-          console.error("Unknown message type");
-        }
-      });
-
-      setWs(ws);
     });
+
+    setWs(ws);
 
     return () => {
       ws && ws.close();
       setWs(null);
     };
-  }, [router]);
+  }, [user]);
 
   function sendMsg() {
     const input = inputRef.current;
-    if (!input || !ws || ws.readyState !== WebSocket.OPEN || !me) return;
+    if (!input || !ws || ws.readyState !== WebSocket.OPEN || !user) return;
     const value = aesEncode2base64(
-      JSON.stringify({ user: me.uuid, value: input.value })
+      JSON.stringify({ user: user.uuid, value: input.value })
     );
     const StrUTF8ByteLength = 1024 * 4;
     const encoder = new TextEncoder();
@@ -119,10 +113,10 @@ export default function ChatRoomPage() {
   return (
     <section className={`${style["chat-room-root"]} w-full h-full`}>
       <div className={style["chat-aside"]}>
-        <ul className={style["user-list"]}>{renderUserList(users, me)}</ul>
+        <ul className={style["user-list"]}>{renderUserList(users, user)}</ul>
       </div>
       <div className={style["chat-main"]}>
-        <div className={style["msg-list"]}>{renderMSGList(messages, me)}</div>
+        <div className={style["msg-list"]}>{renderMSGList(messages, user)}</div>
         <div>
           <div>
             <input ref={inputRef}></input>

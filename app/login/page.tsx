@@ -1,16 +1,17 @@
 "use client";
 import style from "./page.module.css";
 import { Button } from "antd";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { PoweroffOutlined } from "@ant-design/icons";
 import MyInput, {
   t_myinput_return_status,
   t_myinput_status,
-} from "@/components/MyInput";
+} from "@/components/my_input";
 import UseSVG from "@/components/usesvg";
-import { fetchJSON, getUser } from "@/common/utils";
-import { clearLocalUser, getLocalUser, setLocalUser } from "@/common/user";
+import { clearLocalUser, getLocalUser, setLocalUser } from "@/common/utils";
 import { t_user } from "@/common/types";
+import { UserContext } from "@/common/context";
+import { logout, signin, signup } from "@/common/api";
 
 function strCheck(size: [number, number], match: RegExp) {
   return (
@@ -44,6 +45,7 @@ const pwdCheck = strCheck([5, 16], /^[a-zA-Z][a-zA-Z0-9.#@*-+]+$/);
 const nicknameCheck = strCheck([5, 16], /^[a-zA-Z][a-zA-Z0-9]+$/);
 
 export default function LoginPage() {
+  const userCtx = useContext(UserContext);
   const [msg, setMsg] = useState("");
   const [user, setUser] = useState<null | t_user>(null);
   const [active, setActive] = useState<boolean>(true);
@@ -79,11 +81,7 @@ export default function LoginPage() {
 
   async function login(err: string) {
     let result = "";
-    const { data: user } = await fetchJSON(
-      "/user",
-      { type: "login", data: { name, pwd } },
-      { method: "POST" }
-    );
+    const user = await signin(name, pwd);
     if (user) {
       setUser(user);
       setLocalUser(user, user.token);
@@ -109,11 +107,7 @@ export default function LoginPage() {
     if (active) {
       result = await login("用户名或密码错误");
     } else {
-      const { data: msg } = await fetchJSON(
-        "/user",
-        { type: "signup", data: { name, nickname, pwd } },
-        { method: "POST" }
-      );
+      const msg = await signup(name, nickname, pwd);
       if (msg) {
         result = await login("注册登陆失败");
       } else {
@@ -143,13 +137,6 @@ export default function LoginPage() {
       signalController.abort();
     };
   });
-  useEffect(() => {
-    getUser().then((d) => {
-      if (d) {
-        setUser(d);
-      }
-    });
-  }, []);
 
   function renderInfo() {
     if (!user) return null;
@@ -176,11 +163,7 @@ export default function LoginPage() {
           onClick={() => {
             const user = getLocalUser();
             if (user) {
-              fetchJSON(
-                "user",
-                { type: "logout", data: user.token },
-                { method: "POST" }
-              );
+              logout(user.token);
             }
             clearLocalUser();
             setUser(null);

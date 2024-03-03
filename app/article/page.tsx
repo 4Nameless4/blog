@@ -4,28 +4,48 @@ import style from "./page.module.css";
 import Link from "next/link";
 import { getArticleList } from "@/common/api";
 import { t_article_view, t_token_user } from "@/common/types";
-import { formatDate, getUser } from "@/common/utils";
-import { PlusOutlined } from "@ant-design/icons";
+import { formatDate } from "@/common/utils";
+import { PlusOutlined, EditOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
+import { TextTitle } from "@/components/text_title";
 
-function renderActicleList(list: t_article_view[] | null | false | undefined) {
+function renderActicleList(
+  list: t_article_view[] | null | false | undefined,
+  props: { hasUser?: boolean } = {}
+) {
+  const editBtn = props.hasUser
+    ? (d: t_article_view) => (
+        <Button
+          className={style["edit-btn"]}
+          title="Edit article"
+          shape="circle"
+        >
+          <Link href={`/article/${d.id}?type=edit`}>
+            <EditOutlined />
+          </Link>
+        </Button>
+      )
+    : null;
+
   if (list) {
-    const itemClass = style["item"];
     return list.map((d) => {
       const date = new Date(d.updateTime);
       return (
-        <Link
-          key={d.id + d.userID}
-          className={itemClass}
-          href={`/article/${d.id}`}
-        >
-          <h2 className={style["item-title"]}>{d.title}</h2>
-          <p className={style["item-content"]}>{d.content}</p>
-          <div className={style["item-info"]}>
-            <span>{d.user.nickname}</span>
-            <span>{formatDate(date)}</span>
-          </div>
-        </Link>
+        <div className={style["item"]} key={d.id + d.userID}>
+          <Link className={style["item-card"]} href={`/article/${d.id}`}>
+            <h2>
+              <TextTitle str={d.title} />
+            </h2>
+            <p className={style["item-content"]}>
+              <TextTitle str={d.content} />
+            </p>
+            <div className={style["item-info"]}>
+              <span>{d.user.nickname}</span>
+              <span>{formatDate(date)}</span>
+            </div>
+          </Link>
+          {editBtn && editBtn(d)}
+        </div>
       );
     });
   }
@@ -35,13 +55,10 @@ function renderActicleList(list: t_article_view[] | null | false | undefined) {
 
 function renderCreateBtn() {
   return (
-    <div className={`${style["item"]} ${style["item-new"]}`}>
+    <div className={`${style["item-new"]}`}>
       <Button type="primary" className={style["new-btn"]} title="Create new">
-        <Link
-          className={`${style["item"]} ${style["item-new"]}`}
-          href="/article/new"
-        >
-          <PlusOutlined className={style["new-btn-icon"]} />
+        <Link className={`${style["item-new"]}`} href="/article/new">
+          <PlusOutlined />
         </Link>
       </Button>
     </div>
@@ -49,24 +66,24 @@ function renderCreateBtn() {
 }
 
 export default function ArticleOverviewPage() {
-  const [list, setList] = useState<false | t_article_view[]>(false);
-  const [user, setUser] = useState<false | t_token_user>(false);
+  const [list, setList] = useState<null | t_article_view[]>(null);
+  // const [user, setUser] = useState<null | t_token_user>(null);
 
   useEffect(() => {
-    Promise.all([getArticleList(), getUser()]).then(([_l, _u]) => {
+    getArticleList().then((_l) => {
       setList(_l);
-      setUser(_u);
+      // setUser(_u);
     });
   }, []);
 
   return (
     <div className={style["article-overview-page-root"]}>
       <div className={style["overview-top-bar"]}>
-        <span className={style["overview-title"]}>ArticleOverview</span>
+        <TextTitle str="ArticleOverview" />
       </div>
       <section className={style["grid-container"]}>
         {user ? renderCreateBtn() : null}
-        {renderActicleList(list)}
+        {renderActicleList(list, { hasUser: !!user })}
       </section>
     </div>
   );

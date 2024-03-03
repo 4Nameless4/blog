@@ -1,73 +1,33 @@
-// "use client"
-import { AES, enc, mode, pad } from "crypto-js";
-import type { lib } from "crypto-js";
-import { clearLocalUser, getLocalUser, setLocalUser } from "./user";
+import { aesEncode2base64, base642aesDecode } from "./crypto";
 import { t_token_user, t_user } from "./types";
 
-const key1 = enc.Utf8.parse(process.env.key1 || "");
-const key2 = process.env.key2 || "";
-const iv = enc.Utf8.parse(process.env.iv || "");
-function encode(data: string | lib.WordArray, key: string | lib.WordArray) {
-  return AES.encrypt(data, key, {
-    iv: iv,
-    mode: mode.CBC,
-    padding: pad.Pkcs7,
+export async function request(
+  api: string,
+  data: string,
+  headers?: HeadersInit 
+) {
+  const token = getUserToken()
+  const res = await fetch(process.env.SERVER + api, {
+    method: "POST",
+    mode: "cors",
+    headers: {
+      Accept: "application/json",
+      "Content-Type": "application/json;charset=utf-8",
+      "Authorization": token,
+      ...headers,
+    },
+    body: JSON.stringify(aesEncode2base64(data)),
   });
+  const json = await res.json();
+  return base642aesDecode(json);
 }
-function decode(data: string | lib.CipherParams, key: string | lib.WordArray) {
-  return AES.decrypt(data, key, {
-    iv: iv,
-    mode: mode.CBC,
-    padding: pad.Pkcs7,
+export async function requestGet(api: string) {
+  const res = await fetch(process.env.SERVER + api, {
+    method: "GET",
+    mode: "cors",
   });
-}
-export function aesEncode2base64(data: string) {
-  const msg = enc.Utf8.parse(data);
-  const key = decode(key2, key1);
-  return enc.Base64.stringify(encode(msg, key).ciphertext);
-}
-export function base642aesDecode(data: string) {
-  const key = decode(key2, key1);
-  return decode(data, key).toString(enc.Utf8);
-}
-
-export function base64ToString(base64: string) {
-  let binString = "";
-  if (Buffer) {
-    const buf = new Buffer(base64, "base64");
-    binString = buf.toString();
-  } else if (!!window) {
-    binString = window.atob(base64);
-    binString = new TextDecoder().decode(
-      Uint8Array.from(binString as any, (m: any) => m.codePointAt(0))
-    );
-  }
-  return binString;
-}
-
-export async function getUser(): Promise<t_token_user | false> {
-  const user = getLocalUser();
-  let info: t_token_user | false = false;
-  if (user) {
-    const token = user.token;
-    const { data: checkInfo } = await fetch("/user", {
-      method: "POST",
-      body: JSON.stringify({ type: "check", data: token }),
-    }).then((d) => d.json());
-    info = checkInfo;
-    info && setLocalUser(info, token);
-  }
-  if (!info) {
-    clearLocalUser();
-  }
-  return info;
-}
-
-export function fetchJSON(path: string, data: any, options: RequestInit) {
-  return fetch(path, {
-    body: JSON.stringify(data),
-    ...options,
-  }).then((d) => d.json());
+  const text = await res.text();
+  return base642aesDecode(text);
 }
 
 export function formatZeroToLeft(num: number, length: number = 2) {
@@ -80,8 +40,41 @@ export function formatZeroToLeft(num: number, length: number = 2) {
   return str;
 }
 
-export function formatDate(date: Date, isHour: boolean = false) {
+export function formatDate(date: Date) {
   let month = formatZeroToLeft(date.getMonth() + 1);
   let day = formatZeroToLeft(date.getDate());
   return `${date.getFullYear()}/${month}/${day}`;
+}
+
+export function getLocalUser(): t_token_user | null {
+  const userStr = localStorage.getItem("user");
+  if (!userStr) {
+    return null;
+  }
+  try {
+    const origin = base642aesDecode(userStr);
+    return JSON.parse(origin);
+  } catch {
+    return null;
+  }
+}
+
+export function setLocalUser(user: t_user, token: string) {
+  const userBase = aesEncode2base64(
+    JSON.stringify({
+      ...user,
+      token,
+    })
+  );
+  localStorage.setItem("user", userBase);
+}
+
+export function clearLocalUser() {
+  localStorage.removeItem("user");
+}
+
+export function getUserToken() {
+  const user = getLocalUser();
+
+  return (user && user.token) || "";
 }

@@ -1,24 +1,29 @@
+"use client";
 import "./globals.css";
 import type { Metadata } from "next";
 import Menu from "../components/menu";
-
-export const metadata: Metadata = {
-  title: "MZW Blog",
-  description: "Created by NextJS",
-};
+import { UserContext } from "@/common/context";
+import { useUser } from "@/common/hooks";
 
 export default function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const user = useUser();
+  
   return (
     <html lang="en">
+      <head>
+        <title>MZW Blog</title>
+      </head>
       <body className="min-h-screen flex flex-col">
-        <header className="contents">
-          <Menu />
-        </header>
-        <main className="grid p-24 flex-1 z-0">{children}</main>
+        <UserContext.Provider value={user}>
+          <header className="contents">
+            <Menu />
+          </header>
+          <main className="grid p-24 flex-1 z-0">{children}</main>
+        </UserContext.Provider>
       </body>
     </html>
   );

@@ -1,5 +1,5 @@
 import { ForwardedRef, forwardRef, useState } from "react";
-import style from "./MyInput.module.css";
+import style from "./my_input.module.css";
 
 export type t_myinput_status = "error" | "warn" | "none" | "success";
 export type t_myinput_return_status = {
