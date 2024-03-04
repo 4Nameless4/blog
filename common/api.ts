@@ -1,3 +1,4 @@
+import { base64ToString } from "./crypto";
 import {
   t_article,
   t_article_type,
@@ -6,7 +7,13 @@ import {
   t_token_user,
   t_user,
 } from "./types";
-import { clearLocalUser, getUserToken, request, requestGet, setLocalUser } from "./utils";
+import {
+  clearLocalUser,
+  getUserToken,
+  request,
+  requestGet,
+  setLocalUser,
+} from "./utils";
 
 export async function logout(token: string) {
   return request("/User/logout", token);
@@ -43,7 +50,9 @@ export async function signup(name: string, pwd: string, nickname: string) {
 }
 export async function getResume() {
   return Promise.all([
-    fetch(process.env.StaticSERVER + "/resumeinfo").then((r) => r.json()),
+    fetch(process.env.StaticSERVER + "/resumeinfo")
+      .then((r) => r.text())
+      .then((r) => JSON.parse(base64ToString(r))),
     fetch(process.env.StaticSERVER + "/resumeTemplate.docx")
       .then((r) => r.blob())
       .then((r) => r.arrayBuffer()),
@@ -119,5 +128,3 @@ export async function getArticleTypes() {
   }
   return info;
 }
-
-
