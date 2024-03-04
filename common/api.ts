@@ -22,7 +22,7 @@ export async function signin(name: string, pwd: string) {
 }
 export async function checkUser(token: string) {
   const result = await request("/User/check", token);
-  let info: null | t_user = null;
+  let info: null | t_token_user = null;
   const resultJson: t_result<t_token_user> = JSON.parse(result);
   if (resultJson.code === "1") {
     info = resultJson.data;
@@ -120,16 +120,4 @@ export async function getArticleTypes() {
   return info;
 }
 
-export async function getUser(): Promise<t_token_user | null> {
-  const token = getUserToken();
-  let info: t_token_user | null = null;
-  if (token) {
-    const info = await checkUser(token);
-    info && setLocalUser(info, token);
-  }
-  if (!info) {
-    clearLocalUser();
-  }
-  return info;
-}
 

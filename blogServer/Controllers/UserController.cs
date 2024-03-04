@@ -80,7 +80,7 @@ namespace blogServer.Controllers
         [HttpPost("check")]
         public string Check([FromBody] string base64)
         {
-            Result<User> res = new Result<User>() { code = "0", data = new User(), msg = "" };
+            Result<IDictionary<string, object>> res = new Result<IDictionary<string, object>>() { code = "0", data = new Dictionary<string, object>(), msg = "" };
             try
             {
                 var token = CryptoHelper.decode(base64);
@@ -92,9 +92,11 @@ namespace blogServer.Controllers
                     var flag = tokens.Exists(d => d.Trim() == token.Trim());
                     if (dataUser != null && flag)
                     {
+                        var user = dataUser.ToDictionary();
+                        user.Add("token", token);
                         res.code = "1";
                         dataUser.pwd = "";
-                        res.data = dataUser;
+                        res.data = user;
                     }
                     else
                     {
@@ -126,6 +128,7 @@ namespace blogServer.Controllers
                     _user.pwd = "";
                     var user = _user.ToDictionary();
                     var token = TokenHelper.CreateJwtToken(user);
+                    user.Add("token", token);
                     res.code = "1";
                     res.data = user;
 

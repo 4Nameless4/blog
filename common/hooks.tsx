@@ -1,10 +1,24 @@
 "use client";
 import { useRouter, usePathname } from "next/navigation";
-import { getUser } from "./api";
 import { useEffect, useState } from "react";
 import { t_token_user } from "./types";
 import { Spin } from "antd";
 import { routes } from "./router";
+import { clearLocalUser, getUserToken, setLocalUser } from "./utils";
+import { checkUser } from "./api";
+
+export async function getUser(): Promise<t_token_user | null> {
+  const token = getUserToken();
+  let info: t_token_user | null = null;
+  if (token) {
+    info = await checkUser(token);
+    info && setLocalUser(info, token);
+  }
+  if (!info) {
+    clearLocalUser();
+  }
+  return info;
+}
 
 export function useUser() {
   const [user, setUser] = useState<t_token_user | null>(null);

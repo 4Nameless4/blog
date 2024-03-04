@@ -1,3 +1,4 @@
+"use client"
 import { aesEncode2base64, base642aesDecode } from "./crypto";
 import { t_token_user, t_user } from "./types";
 
