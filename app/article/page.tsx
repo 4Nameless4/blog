@@ -3,11 +3,12 @@ import Button from "antd/es/button";
 import style from "./page.module.css";
 import Link from "next/link";
 import { getArticleList } from "@/common/api";
-import { t_article_view, t_token_user } from "@/common/types";
+import { t_article_view } from "@/common/types";
 import { formatDate } from "@/common/utils";
 import { PlusOutlined, EditOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { TextTitle } from "@/components/text_title";
+import { useUserContext } from "@/common/context";
 
 function renderActicleList(
   list: t_article_view[] | null | false | undefined,
@@ -67,7 +68,7 @@ function renderCreateBtn() {
 
 export default function ArticleOverviewPage() {
   const [list, setList] = useState<null | t_article_view[]>(null);
-  // const [user, setUser] = useState<null | t_token_user>(null);
+  const [user] = useUserContext();
 
   useEffect(() => {
     getArticleList().then((_l) => {

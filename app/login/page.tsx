@@ -1,7 +1,7 @@
 "use client";
 import style from "./page.module.css";
 import { Button } from "antd";
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { PoweroffOutlined } from "@ant-design/icons";
 import MyInput, {
   t_myinput_return_status,
@@ -9,8 +9,7 @@ import MyInput, {
 } from "@/components/my_input";
 import UseSVG from "@/components/usesvg";
 import { clearLocalUser, getLocalUser, setLocalUser } from "@/common/utils";
-import { t_user } from "@/common/types";
-import { UserContext } from "@/common/context";
+import { useUserContext } from "@/common/context";
 import { logout, signin, signup } from "@/common/api";
 
 function strCheck(size: [number, number], match: RegExp) {
@@ -45,9 +44,8 @@ const pwdCheck = strCheck([5, 16], /^[a-zA-Z][a-zA-Z0-9.#@*-+]+$/);
 const nicknameCheck = strCheck([5, 16], /^[a-zA-Z][a-zA-Z0-9]+$/);
 
 export default function LoginPage() {
-  const userCtx = useContext(UserContext);
+  const [user, setUser] = useUserContext();
   const [msg, setMsg] = useState("");
-  const [user, setUser] = useState<null | t_user>(null);
   const [active, setActive] = useState<boolean>(true);
   const [name, setName] = useState<string>("");
   const [pwd, setPwd] = useState<string>("");

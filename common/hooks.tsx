@@ -37,7 +37,7 @@ export function useUser() {
     });
   }, [router, pathname]);
 
-  return user;
+  return [user, setUser] as const;
 }
 
 export function useLoading(render: () => JSX.Element, flag: boolean) {

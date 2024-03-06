@@ -1,15 +1,14 @@
 "use client";
 import { FloatButton, Modal, Spin } from "antd";
-import { useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Pizzip from "pizzip";
 import DocxTemplater from "docxtemplater";
 import { saveAs } from "file-saver";
 import UseSVG from "../../components/usesvg";
 import style from "./page.module.css";
-import { useRouter } from "next/navigation";
-import { UserContext } from "@/common/context";
+import { useUserContext } from "@/common/context";
 import { getResume } from "@/common/api";
-import { useLoading, useUser } from "@/common/hooks";
+import { useLoading } from "@/common/hooks";
 
 function fillResumeTemplate(arraybuffer: ArrayBuffer, json: any) {
   const zip = new Pizzip(arraybuffer);
@@ -86,7 +85,7 @@ function getDescSec(resumeJSON: Record<string, any> | null) {
 }
 
 export default function ResumePage() {
-  const user = useContext(UserContext);
+  const [user] = useUserContext();
   const resume = useRef<HTMLElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [resumeFillBlob, setResumeFillBlob] = useState<null | Blob>(null);

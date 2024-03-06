@@ -10,7 +10,7 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = useUser();
+  const userCtx = useUser();
   
   return (
     <html lang="en">
@@ -18,7 +18,7 @@ export default function RootLayout({
         <title>MZW Blog</title>
       </head>
       <body className="min-h-screen flex flex-col">
-        <UserContext.Provider value={user}>
+        <UserContext.Provider value={userCtx}>
           <header className="contents">
             <Menu />
           </header>
