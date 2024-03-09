@@ -1,29 +1,56 @@
-"use client"
+"use client";
 import { aesEncode2base64, base642aesDecode } from "./crypto";
+import { setStateLoading } from "./store";
 import { t_token_user, t_user } from "./types";
 
 export async function request(
-  api: string,
-  data: string,
-  headers?: HeadersInit 
+  url: string,
+  name: string,
+  params: RequestInit = {}
 ) {
-  const token = getUserToken()
-  const res = await fetch(process.env.SERVER + api, {
+  const promise = fetch(url, params);
+  setStateLoading(name, promise);
+  const res = await promise;
+  promise.finally(() => {
+    console.log("done", name);
+    setStateLoading(name, promise, true);
+  });
+
+  return res;
+}
+export async function requestAPI(
+  url: string,
+  name: string,
+  params: RequestInit = {}
+) {
+  const token = getUserToken();
+  const headers = params.headers || (params.headers = {});
+  Object.assign(headers, {
+    Authorization: token,
+  });
+  return request(process.env.SERVER + url, name, params);
+}
+export async function requestJSON(
+  api: string,
+  name: string,
+  data?: string,
+  headers?: HeadersInit
+) {
+  const res = await requestAPI(api, name, {
     method: "POST",
     mode: "cors",
     headers: {
       Accept: "application/json",
       "Content-Type": "application/json;charset=utf-8",
-      "Authorization": token,
       ...headers,
     },
-    body: JSON.stringify(aesEncode2base64(data)),
+    body: data && JSON.stringify(aesEncode2base64(data)),
   });
   const json = await res.json();
   return base642aesDecode(json);
 }
-export async function requestGet(api: string) {
-  const res = await fetch(process.env.SERVER + api, {
+export async function requestGet(api: string, name: string) {
+  const res = await requestAPI(api, name, {
     method: "GET",
     mode: "cors",
   });

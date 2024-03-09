@@ -157,5 +157,5 @@ export default function ResumePage() {
       </article>
     );
   }
-  return useLoading(renderPage, !!resumeJSON);
+  return useLoading(renderPage, ["getResumeInfo", "getResumeTemplate"]);
 }

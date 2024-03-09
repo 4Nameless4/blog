@@ -35,3 +35,5 @@ export type t_article_view = t_article & {
   user: t_user;
   typesArr: t_article_type[];
 };
+
+export type t_loading_stack = Record<string, Promise<unknown>>
