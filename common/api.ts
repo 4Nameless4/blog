@@ -6,24 +6,15 @@ import {
   t_article_view,
   t_result,
   t_token_user,
-  t_user,
 } from "./types";
-import {
-  clearLocalUser,
-  getUserToken,
-  request,
-  requestJSON,
-  requestGet,
-  setLocalUser,
-} from "./utils";
+import { request, requestJSON, requestGet } from "./utils";
 
 export async function logout(token: string) {
-  return requestJSON("/User/logout", "logout", token);
+  return requestJSON("/User/logout", token);
 }
 export async function signin(name: string, pwd: string) {
   const result = await requestJSON(
     "/User/signin",
-    "signin",
     JSON.stringify({ name, pwd })
   );
   let info: null | t_token_user = null;
@@ -34,7 +25,7 @@ export async function signin(name: string, pwd: string) {
   return info;
 }
 export async function checkUser(token: string) {
-  const result = await requestJSON("/User/check", "checkUser", token);
+  const result = await requestJSON("/User/check", token);
   let info: null | t_token_user = null;
   const resultJson: t_result<t_token_user> = JSON.parse(result);
   if (resultJson.code === "1") {
@@ -45,7 +36,6 @@ export async function checkUser(token: string) {
 export async function signup(name: string, pwd: string, nickname: string) {
   const result = await requestJSON(
     "/User/signup",
-    "signup",
     JSON.stringify({ name, nickname, pwd })
   );
   let info: boolean = false;
@@ -57,23 +47,16 @@ export async function signup(name: string, pwd: string, nickname: string) {
 }
 export async function getResume() {
   return Promise.all([
-    request(process.env.StaticSERVER + "/resumeinfo", "getResumeInfo")
+    request(process.env.StaticSERVER + "/resumeinfo")
       .then((r) => r.text())
       .then((r) => JSON.parse(base64ToString(r))),
-    request(
-      process.env.StaticSERVER + "/resumeTemplate.docx",
-      "getResumeTemplate"
-    )
+    request(process.env.StaticSERVER + "/resumeTemplate.docx")
       .then((r) => r.blob())
-      .then((r) => {
-        return new Promise((res) => {
-          setTimeout(() => res(r.arrayBuffer()), 5000);
-        });
-      }),
+      .then((r) => r.arrayBuffer()),
   ]);
 }
 export async function getArticle(id: string) {
-  const result = await requestGet(`/Article/get?id=${id}`, "getArticle");
+  const result = await requestGet(`/Article/get?id=${id}`);
 
   let info: null | t_article_view = null;
   const resultJson: t_result<t_article_view> = JSON.parse(result);
@@ -83,7 +66,7 @@ export async function getArticle(id: string) {
   return info;
 }
 export async function getArticleList() {
-  const result = await requestGet(`/Article/getAll`, "getArticleList");
+  const result = await requestGet(`/Article/getAll`);
 
   let info: null | t_article_view[] = null;
   const resultJson: t_result<t_article_view[]> = JSON.parse(result);
@@ -95,11 +78,7 @@ export async function getArticleList() {
 export async function createArticle(
   article: Omit<t_article, "id" | "createTime" | "updateTime" | "viewCount">
 ) {
-  const result = await requestJSON(
-    `/Article/create`,
-    "createArticle",
-    JSON.stringify(article)
-  );
+  const result = await requestJSON(`/Article/create`, JSON.stringify(article));
 
   let info: null | t_article_view = null;
   const resultJson: t_result<t_article_view> = JSON.parse(result);
@@ -111,11 +90,7 @@ export async function createArticle(
 export async function updateArticle(
   article: Omit<t_article, "createTime" | "updateTime" | "viewCount">
 ) {
-  const result = await requestJSON(
-    `/Article/update`,
-    "updateArticle",
-    JSON.stringify(article)
-  );
+  const result = await requestJSON(`/Article/update`, JSON.stringify(article));
 
   let info: null | t_article_view[] = null;
   const resultJson: t_result<t_article_view[]> = JSON.parse(result);
@@ -127,7 +102,6 @@ export async function updateArticle(
 export async function deleteArticle(articleID: string, userToken: string) {
   const result = await requestJSON(
     `/Article/delete`,
-    "deleteArticle",
     JSON.stringify({
       articleID,
       userToken,
@@ -142,7 +116,7 @@ export async function deleteArticle(articleID: string, userToken: string) {
   return info;
 }
 export async function getArticleTypes() {
-  const result = await requestGet(`/Article/types`, "getArticleTypes");
+  const result = await requestGet(`/Article/types`);
 
   let info: t_article_type | null = null;
   const resultJson: t_result<t_article_type> = JSON.parse(result);

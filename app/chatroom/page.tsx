@@ -1,9 +1,9 @@
 "use client";
 import style from "./page.module.css";
 import { useEffect, useRef, useState } from "react";
-import { t_result, t_user } from "@/common/types";
+import { t_result, t_token_user, t_user } from "@/common/types";
 import { aesEncode2base64, base642aesDecode } from "@/common/crypto";
-import { useUserContext } from "@/common/context";
+import { useStoreState } from "@/common/store";
 
 interface t_msg {
   time: string;
@@ -55,7 +55,7 @@ function renderMSGList(messages: t_msg[], me: t_user | null | false) {
 }
 
 export default function ChatRoomPage() {
-  const [user] = useUserContext();
+  const user = useStoreState<t_token_user>("user");
   // const [me, setMe] = useState<null | t_user>(null);
   const [users, setUsers] = useState<t_user[]>([]);
   const [messages, setMsg] = useState<t_msg[]>([]);

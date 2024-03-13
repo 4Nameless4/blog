@@ -9,8 +9,9 @@ import MyInput, {
 } from "@/components/my_input";
 import UseSVG from "@/components/usesvg";
 import { clearLocalUser, getLocalUser, setLocalUser } from "@/common/utils";
-import { useUserContext } from "@/common/context";
 import { logout, signin, signup } from "@/common/api";
+import { t_token_user } from "@/common/types";
+import { useStoreState, setStoreState } from "@/common/store";
 
 function strCheck(size: [number, number], match: RegExp) {
   return (
@@ -44,7 +45,7 @@ const pwdCheck = strCheck([5, 16], /^[a-zA-Z][a-zA-Z0-9.#@*-+]+$/);
 const nicknameCheck = strCheck([5, 16], /^[a-zA-Z][a-zA-Z0-9]+$/);
 
 export default function LoginPage() {
-  const [user, setUser] = useUserContext();
+  const user = useStoreState<t_token_user>("user");
   const [msg, setMsg] = useState("");
   const [active, setActive] = useState<boolean>(true);
   const [name, setName] = useState<string>("");
@@ -81,7 +82,7 @@ export default function LoginPage() {
     let result = "";
     const user = await signin(name, pwd);
     if (user) {
-      setUser(user);
+      setStoreState("user", user);
       setLocalUser(user, user.token);
       setActive(true);
     } else {
@@ -164,7 +165,7 @@ export default function LoginPage() {
               logout(user.token);
             }
             clearLocalUser();
-            setUser(null);
+            setStoreState("user", null)
           }}
           className={style["logout-btn"]}
         />

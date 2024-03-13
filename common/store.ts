@@ -7,6 +7,7 @@ type t_store = {
 };
 const store: Record<string, any> = {
   loadingStack: {},
+  user: null,
 };
 const context = createContext<t_store>({} as any);
 
@@ -44,8 +45,17 @@ export function useStore() {
   return __Store;
 }
 
-export function setState(key: string, val: any) {
+export function setStoreState(key: string, val: any) {
   return __Store.setState(key, val);
+}
+
+export function readStoreState<T>(key: string): T {
+  return __Store.state[key];
+}
+
+export function useStoreState<T>(key: string): T {
+  const store = useContext(context);
+  return store.state[key];
 }
 
 export function setStateLoading(
@@ -53,7 +63,7 @@ export function setStateLoading(
   promise: Promise<any>,
   remove: boolean = false
 ) {
-  setState("loadingStack", (old: t_loading_stack) => {
+  setStoreState("loadingStack", (old: t_loading_stack) => {
     if (!remove) {
       old[name] = promise;
     } else if (promise === old[name]) {

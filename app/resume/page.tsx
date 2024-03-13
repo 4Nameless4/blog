@@ -6,9 +6,10 @@ import DocxTemplater from "docxtemplater";
 import { saveAs } from "file-saver";
 import UseSVG from "../../components/usesvg";
 import style from "./page.module.css";
-import { useUserContext } from "@/common/context";
 import { getResume } from "@/common/api";
 import { useLoading } from "@/common/hooks";
+import { useStoreState } from "@/common/store";
+import { t_token_user } from "@/common/types";
 
 function fillResumeTemplate(arraybuffer: ArrayBuffer, json: any) {
   const zip = new Pizzip(arraybuffer);
@@ -85,21 +86,26 @@ function getDescSec(resumeJSON: Record<string, any> | null) {
 }
 
 export default function ResumePage() {
-  const [user] = useUserContext();
+  const user = useStoreState<t_token_user>("user");
   const resume = useRef<HTMLElement | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [resumeFillBlob, setResumeFillBlob] = useState<null | Blob>(null);
   const [resumeJSON, setResumeJSON] = useState<null | Record<string, any>>(
     null
   );
+  const [loading, setLoading] = useState(new Promise(() => {}));
 
   useEffect(() => {
     if (user) {
-      getResume().then(([json, arrayBuffer]) => {
-        setResumeJSON(json);
-        const fillBlob = fillResumeTemplate(arrayBuffer, json);
-        setResumeFillBlob(fillBlob);
-      });
+      getResume()
+        .then(([json, arrayBuffer]) => {
+          setResumeJSON(json);
+          const fillBlob = fillResumeTemplate(arrayBuffer, json);
+          setResumeFillBlob(fillBlob);
+        })
+        .then(() => {
+          setLoading(Promise.resolve());
+        });
     }
   }, [user]);
 
@@ -115,10 +121,12 @@ export default function ResumePage() {
       console.error(e);
     }
   }, [isModalOpen, resumeFillBlob]);
+
   function _download() {
     if (!resumeFillBlob) return;
     saveAs(resumeFillBlob, "resume.docx");
   }
+
   const dialogContent = useMemo(() => {
     if (resumeFillBlob) {
       return (
@@ -131,6 +139,7 @@ export default function ResumePage() {
       return <Spin />;
     }
   }, [resumeFillBlob]);
+
   function renderPage() {
     return (
       <article className={`${style["resume-page-root"]}`}>
@@ -157,5 +166,5 @@ export default function ResumePage() {
       </article>
     );
   }
-  return useLoading(renderPage, ["getResumeInfo", "getResumeTemplate"]);
+  return useLoading(renderPage, [loading]);
 }

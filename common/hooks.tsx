@@ -6,7 +6,7 @@ import { Spin } from "antd";
 import { routes } from "./router";
 import { clearLocalUser, getUserToken, setLocalUser } from "./utils";
 import { checkUser } from "./api";
-import { useStore } from "./store";
+import { setStoreState, useStore } from "./store";
 
 export async function getUser(): Promise<t_token_user | null> {
   const token = getUserToken();
@@ -22,7 +22,6 @@ export async function getUser(): Promise<t_token_user | null> {
 }
 
 export function useUser() {
-  const [user, setUser] = useState<t_token_user | null>(null);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -31,45 +30,52 @@ export function useUser() {
       const route = routes[pathname];
       const userRedirect = route.userRedirect;
       if (d) {
-        setUser(d);
+        setStoreState("user", d);
       } else if (route && userRedirect) {
         router.replace(userRedirect);
       }
     });
   }, [router, pathname]);
-
-  return [user, setUser] as const;
 }
-
-const loadingTemplate = (
-  <div className="flex justify-center items-center">
-    <Spin />
-  </div>
-);
 
 export function useLoading(
   render: () => JSX.Element,
-  flags: string | string[] = []
+  flags:
+    | string
+    | (string | Promise<any> | unknown)[]
+    | Promise<any>
+    | unknown = []
 ) {
   const store = useStore();
   const loadingStack: t_loading_stack = store.state.loadingStack || {};
-  console.log("change", loadingStack);
-  let [loading, setLoading] = useState(true);
+  let [loading, setLoading] = useState(!!flags);
 
-  if (typeof flags === "string") flags = [flags];
+  let loop: (string | Promise<any> | unknown)[] = [];
+  if (!Array.isArray(flags)) {
+    loop = [flags] as any[];
+  } else {
+    loop = flags;
+  }
 
   const _flags = [];
-  for (const i of flags) {
-    if (i in loadingStack) {
+  for (const i of loop) {
+    if (typeof i === "string" && i in loadingStack) {
       _flags.push(loadingStack[i]);
+    } else if (i instanceof Promise) {
+      _flags.push(i);
     }
   }
 
-  if (_flags.length) {
+  if (flags) {
     Promise.allSettled(_flags).then(() => {
       setLoading(false);
     });
   }
 
+  const loadingTemplate = (
+    <div className="flex justify-center items-center">
+      <Spin />
+    </div>
+  );
   return loading ? loadingTemplate : render();
 }
