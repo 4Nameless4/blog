@@ -24,12 +24,6 @@ export default function RootLayout({
           </header>
           <main className="grid p-24 flex-1 z-0">
             {children}
-            {/* {useLoading(
-                () => (
-                  <>{children}</>
-                ),
-                ["checkUser"]
-              )} */}
           </main>
         </body>
       </html>

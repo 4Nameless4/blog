@@ -1,7 +1,7 @@
 "use client";
 import { aesEncode2base64, base642aesDecode } from "./crypto";
 import { setStateLoading } from "./store";
-import { t_token_user, t_user } from "./types";
+import { t_route, t_token_user, t_user } from "./types";
 
 export async function request(url: string, params: RequestInit = {}) {
   const promise = fetch(url, params);
@@ -91,4 +91,64 @@ export function getUserToken() {
   const user = getLocalUser();
 
   return (user && user.token) || "";
+}
+
+export function formatPath(path: string) {
+  path = path.trim()
+
+  path = path.replace(/^\//, "").replace(/\/$/, "")
+
+  return {
+    path,
+    arr: path.split("/")
+  };
+}
+
+export function matchRoute(path: string, routes: t_route[]): null | t_route {
+  let result: null | t_route = null;
+  const format = formatPath(path);
+  path = format.path;
+  const currentPathArr = format.arr;
+  const currentPathLen = currentPathArr.length;
+  const currentPathSet = new Set();
+  currentPathArr.forEach((d) => {
+    currentPathSet.add(d);
+  });
+
+  for (const route of routes) {
+    const _format = formatPath(route.path);
+    const _path = _format.path;
+    if (_path === path) {
+      result = route;
+      break;
+    }
+    const routeArr = _format.arr;
+    const routeLen = routeArr.length;
+    if (routeLen >= currentPathLen) {
+      continue;
+    }
+
+    const children = route.children;
+    let index = 0;
+    for (const d of currentPathArr) {
+      const r = routeArr[index];
+      if (index < routeLen) {
+        if (d !== r) {
+          break;
+        }
+      } else if (!children || !children.length) {
+        break;
+      } else {
+        const rr = matchRoute(routeArr.slice(index).join("/"), children);
+        if (rr) {
+          result = rr;
+        } else {
+          break;
+        }
+      }
+      index++;
+    }
+
+  }
+  return result;
 }

@@ -4,14 +4,15 @@ import UseSVG from "./usesvg";
 import { routeArr, t_route } from "@/common/router";
 
 function createRouteItem(route: t_route) {
+  const { path, icon, title = "" } = route;
   return (
     <Link
-      key={route.path}
-      href={route.path}
+      key={path}
+      href={path}
       className={style.btn}
-      title={route.title}
+      title={title}
     >
-      <UseSVG name={route.icon} />
+      {icon ? <UseSVG name={icon} /> : null}
     </Link>
   );
 }

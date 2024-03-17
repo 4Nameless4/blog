@@ -57,11 +57,11 @@ function renderActicleList(
 function renderCreateBtn() {
   return (
     <div className={`${style["item-new"]}`}>
-      <Button type="primary" className={style["new-btn"]} title="Create new">
-        <Link className={`${style["item-new"]}`} href="/article/new">
+      <Link href="/article/new">
+        <Button type="primary" className={style["new-btn"]} title="Create new">
           <PlusOutlined />
-        </Link>
-      </Button>
+        </Button>
+      </Link>
     </div>
   );
 }

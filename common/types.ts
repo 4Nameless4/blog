@@ -1,3 +1,5 @@
+import { NextRequest, NextResponse } from "next/server";
+
 export type t_user = {
   uuid: string;
   name: string;
@@ -37,3 +39,16 @@ export type t_article_view = t_article & {
 };
 
 export type t_loading_stack = Record<string, Promise<unknown>>
+
+type t_callback_return = void | NextResponse;
+type t_callback_returns = t_callback_return | Promise<t_callback_return>;
+type t_callback = (request: NextRequest, path: string) => t_callback_returns;
+
+export type t_route = {
+  path: string;
+  icon?: string;
+  title?: string;
+  callback?: t_callback | t_callback[];
+  userRedirect?: string;
+  children?: t_route[];
+};

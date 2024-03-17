@@ -3,8 +3,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { t_loading_stack, t_token_user } from "./types";
 import { Spin } from "antd";
-import { routes } from "./router";
-import { clearLocalUser, getUserToken, setLocalUser } from "./utils";
+import { routeArr, routes } from "./router";
+import { clearLocalUser, getUserToken, matchRoute, setLocalUser } from "./utils";
 import { checkUser } from "./api";
 import { setStoreState, useStore } from "./store";
 
@@ -27,6 +27,8 @@ export function useUser() {
 
   useEffect(() => {
     getUser().then((d) => {
+      const match = matchRoute(pathname, routeArr);
+      console.log("match", match);
       const route = routes[pathname];
       const userRedirect = route.userRedirect;
       if (d) {
