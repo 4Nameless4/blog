@@ -29,11 +29,10 @@ export function useUser() {
     getUser().then((d) => {
       const match = matchRoute(pathname, routeArr);
       console.log("match", match);
-      const route = routes[pathname];
-      const userRedirect = route.userRedirect;
+      const userRedirect = match && match.userRedirect;
       if (d) {
         setStoreState("user", d);
-      } else if (route && userRedirect) {
+      } else if (match && userRedirect) {
         router.replace(userRedirect);
       }
     });

@@ -139,11 +139,12 @@ export function matchRoute(path: string, routes: t_route[]): null | t_route {
       } else if (!children || !children.length) {
         break;
       } else {
-        const rr = matchRoute(routeArr.slice(index).join("/"), children);
+        const rr = matchRoute(currentPathArr.slice(index).join("/"), children);
         if (rr) {
           result = rr;
-        } else {
           break;
+        } else {
+          continue
         }
       }
       index++;
