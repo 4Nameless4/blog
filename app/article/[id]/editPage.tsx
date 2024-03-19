@@ -49,16 +49,6 @@ export default function EditPage(props: { article?: t_article_view }) {
         autoCapitalize="none"
         name="content"
       ></textarea>
-      {/* <select
-        className={style["edit-content"]}
-        defaultValue={["a"]}
-        multiple
-        name="types"
-      >
-        <option>a</option>
-        <option>b</option>
-        <option>c</option>
-      </select> */}
       <div className={style["edit-toolbar"]}>
         <Button
           title="Apply"

@@ -28,7 +28,6 @@ export function useUser() {
   useEffect(() => {
     getUser().then((d) => {
       const match = matchRoute(pathname, routeArr);
-      console.log("match", match);
       const userRedirect = match && match.userRedirect;
       if (d) {
         setStoreState("user", d);
