@@ -15,14 +15,14 @@ export default function RenderRichText(props: t_rich_text_props) {
 
   return (
     <div
-      className={`${style["root"]} ${className} w-full h-full flex flex-col`}
+      className={`${style["root"]} ${className} flex flex-col backdrop-blur-md shadow shadow-black rounded-md`}
     >
-      <div className={style["header"]}>
-        <span>Enter</span>
-        <span>Preview</span>
+      <div className={`${style["header"]} flex gap-2`}>
+        <span className="cursor-pointer rounded p-1">Write</span>
+        <span className="cursor-pointer rounded p-1">Preview</span>
       </div>
       <textarea
-        className={`${style["textarea"]} w-full h-full resize-none backdrop-blur-md shadow shadow-black p-4 border-0 outline-0`}
+        className={`${style["textarea"]} p-4 border-0 outline-0 box-border bg-transparent`}
         {...textareaProps}
         value={value}
         onChange={(e) => {
