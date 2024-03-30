@@ -21,7 +21,7 @@ function renderActicleList(
           title="Edit article"
           shape="circle"
         >
-          <Link href={`/article/${d.id}?type=edit`}>
+          <Link href={`article/${d.id}?type=edit`}>
             <EditOutlined />
           </Link>
         </Button>
@@ -33,7 +33,7 @@ function renderActicleList(
       const date = new Date(d.updateTime);
       return (
         <div className={style["item"]} key={d.id + d.userID}>
-          <Link className={style["item-card"]} href={`/article/${d.id}`}>
+          <Link className={style["item-card"]} href={`article/${d.id}`}>
             <h2>
               <TextTitle str={d.title} />
             </h2>
@@ -57,7 +57,7 @@ function renderActicleList(
 function renderCreateBtn() {
   return (
     <div className={`${style["item-new"]}`}>
-      <Link href="/article/new">
+      <Link href="article/new">
         <Button type="primary" className={style["new-btn"]} title="Create new">
           <PlusOutlined />
         </Button>
@@ -73,7 +73,6 @@ export default function ArticleOverviewPage() {
   useEffect(() => {
     getArticleList().then((_l) => {
       setList(_l);
-      // setUser(_u);
     });
   }, []);
 

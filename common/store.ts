@@ -1,12 +1,10 @@
 import { Provider, createContext, useContext, useState } from "react";
-import { t_loading_stack } from "./types";
 
 type t_store = {
   state: Record<string, any>;
   setState: (key: string, val: any) => void;
 };
 const store: Record<string, any> = {
-  loadingStack: {},
   user: null,
 };
 const context = createContext<t_store>({} as any);
@@ -56,23 +54,4 @@ export function readStoreState<T>(key: string): T {
 export function useStoreState<T>(key: string): T {
   const store = useContext(context);
   return store.state[key];
-}
-
-export function setStateLoading(
-  name: string,
-  promise: Promise<any>,
-  remove: boolean = false
-) {
-  setStoreState("loadingStack", (old: t_loading_stack) => {
-    if (!remove) {
-      old[name] = promise;
-    } else if (promise === old[name]) {
-      delete old[name];
-    } else {
-      return old;
-    }
-    return {
-      ...old,
-    };
-  });
 }

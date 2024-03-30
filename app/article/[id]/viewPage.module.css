@@ -1,0 +1,34 @@
+.title-view {
+  font-size: 2em;
+  font-weight: bold;
+
+  position: sticky;
+  top: 0;
+
+  background-color: rgba(1, 1, 1, 0.1);
+  backdrop-filter: blur(1px);
+  border-radius: 1em;
+  text-align: center;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.meta-view {
+  display: flex;
+  justify-content: space-between;
+}
+
+.content-view {
+  box-sizing: border-box;
+  /* line-break: anywhere; */
+  overflow-wrap: break-word;
+  flex-grow: 1;
+}
+
+.title-view,
+.meta-view,
+.content-view {
+  padding: 1rem;
+}

@@ -5,7 +5,7 @@ import style from "./editPage.module.css";
 import { useRef } from "react";
 import { t_article, t_article_view, t_token_user } from "@/common/types";
 import { useRouter } from "next/navigation";
-import RenderRichText from "@/components/richText";
+import RenderRichText from "@/components/rich-text";
 
 export default function EditPage(props: { article?: t_article_view }) {
   const article = props.article;
@@ -37,7 +37,7 @@ export default function EditPage(props: { article?: t_article_view }) {
         name="title"
       ></input>
       <RenderRichText
-        className={style["edit-content"]}
+        className={`${style["edit-content"]} card-blur`}
         text=""
         textareaProps={{
           placeholder: "Please input your article content",
@@ -82,7 +82,7 @@ export default function EditPage(props: { article?: t_article_view }) {
               //   deleteArticle(article?.id, user.token);
               // }}
             >
-              Apply
+              Delete
             </Button>
             <Button title="Cancle">Cancle</Button>
           </>

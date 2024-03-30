@@ -38,8 +38,6 @@ export type t_article_view = t_article & {
   typesArr: t_article_type[];
 };
 
-export type t_loading_stack = Record<string, Promise<unknown>>
-
 type t_callback_return = void | NextResponse;
 type t_callback_returns = t_callback_return | Promise<t_callback_return>;
 type t_callback = (request: NextRequest, path: string) => t_callback_returns;

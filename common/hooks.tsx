@@ -1,10 +1,15 @@
 "use client";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import { t_loading_stack, t_token_user } from "./types";
+import { t_token_user } from "./types";
 import { Spin } from "antd";
 import { routeArr, routes } from "./router";
-import { clearLocalUser, getUserToken, matchRoute, setLocalUser } from "./utils";
+import {
+  clearLocalUser,
+  getUserToken,
+  matchRoute,
+  setLocalUser,
+} from "./utils";
 import { checkUser } from "./api";
 import { setStoreState, useStore } from "./store";
 
@@ -38,44 +43,17 @@ export function useUser() {
   }, [router, pathname]);
 }
 
-export function useLoading(
-  render: () => JSX.Element,
-  flags:
-    | string
-    | (string | Promise<any> | unknown)[]
-    | Promise<any>
-    | unknown = []
-) {
-  const store = useStore();
-  const loadingStack: t_loading_stack = store.state.loadingStack || {};
-  let [loading, setLoading] = useState(!!flags);
-
-  let loop: (string | Promise<any> | unknown)[] = [];
-  if (!Array.isArray(flags)) {
-    loop = [flags] as any[];
-  } else {
-    loop = flags;
-  }
-
-  const _flags = [];
-  for (const i of loop) {
-    if (typeof i === "string" && i in loadingStack) {
-      _flags.push(loadingStack[i]);
-    } else if (i instanceof Promise) {
-      _flags.push(i);
-    }
-  }
-
-  if (flags) {
-    Promise.allSettled(_flags).then(() => {
-      setLoading(false);
-    });
-  }
+export function useLoading(render: () => JSX.Element) {
+  let [loading, setLoading] = useState(true);
 
   const loadingTemplate = (
     <div className="flex justify-center items-center">
       <Spin />
     </div>
   );
-  return loading ? loadingTemplate : render();
+  return {
+    loading,
+    setLoading,
+    render: loading ? loadingTemplate : render(),
+  };
 }

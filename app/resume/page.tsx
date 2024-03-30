@@ -93,34 +93,6 @@ export default function ResumePage() {
   const [resumeJSON, setResumeJSON] = useState<null | Record<string, any>>(
     null
   );
-  const [loading, setLoading] = useState(new Promise(() => {}));
-
-  useEffect(() => {
-    if (user) {
-      getResume()
-        .then(([json, arrayBuffer]) => {
-          setResumeJSON(json);
-          const fillBlob = fillResumeTemplate(arrayBuffer, json);
-          setResumeFillBlob(fillBlob);
-        })
-        .then(() => {
-          setLoading(Promise.resolve());
-        });
-    }
-  }, [user]);
-
-  useEffect(() => {
-    try {
-      const el = resume.current;
-      if (!isModalOpen || !el || !resumeFillBlob) return;
-
-      import("docx-preview").then(({ renderAsync }) => {
-        renderAsync(resumeFillBlob, el);
-      });
-    } catch (e) {
-      console.error(e);
-    }
-  }, [isModalOpen, resumeFillBlob]);
 
   function _download() {
     if (!resumeFillBlob) return;
@@ -166,5 +138,32 @@ export default function ResumePage() {
       </article>
     );
   }
-  return useLoading(renderPage, [loading]);
+  const { setLoading, render } = useLoading(renderPage);
+  useEffect(() => {
+    if (user) {
+      getResume()
+        .then(([json, arrayBuffer]) => {
+          setResumeJSON(json);
+          const fillBlob = fillResumeTemplate(arrayBuffer, json);
+          setResumeFillBlob(fillBlob);
+        })
+        .then(() => {
+          setLoading(false);
+        });
+    }
+  }, [user, setLoading]);
+
+  useEffect(() => {
+    try {
+      const el = resume.current;
+      if (!isModalOpen || !el || !resumeFillBlob) return;
+
+      import("docx-preview").then(({ renderAsync }) => {
+        renderAsync(resumeFillBlob, el);
+      });
+    } catch (e) {
+      console.error(e);
+    }
+  }, [isModalOpen, resumeFillBlob]);
+  return render;
 }

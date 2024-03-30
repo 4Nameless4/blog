@@ -1,7 +1,7 @@
 "use client";
 import "./globals.css";
 import Menu from "../components/menu";
-import { useLoading, useUser } from "@/common/hooks";
+import { useUser } from "@/common/hooks";
 import { CreateStore } from "@/common/store";
 
 export default function RootLayout({
