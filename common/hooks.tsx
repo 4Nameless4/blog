@@ -37,7 +37,7 @@ export function useUser() {
       if (d) {
         setStoreState("user", d);
       } else if (match && userRedirect) {
-        router.replace(userRedirect);
+        router.push(userRedirect);
       }
     });
   }, [router, pathname]);

@@ -12,6 +12,7 @@ import { clearLocalUser, getLocalUser, setLocalUser } from "@/common/utils";
 import { logout, signin, signup } from "@/common/api";
 import { t_token_user } from "@/common/types";
 import { useStoreState, setStoreState } from "@/common/store";
+import { useRouter } from "next/navigation";
 
 function strCheck(size: [number, number], match: RegExp) {
   return (
@@ -45,6 +46,7 @@ const pwdCheck = strCheck([5, 16], /^[a-zA-Z][a-zA-Z0-9.#@*-+]+$/);
 const nicknameCheck = strCheck([5, 16], /^[a-zA-Z][a-zA-Z0-9]+$/);
 
 export default function LoginPage() {
+  const router = useRouter();
   const user = useStoreState<t_token_user>("user");
   const [msg, setMsg] = useState("");
   const [active, setActive] = useState<boolean>(true);
@@ -85,6 +87,7 @@ export default function LoginPage() {
       setStoreState("user", user);
       setLocalUser(user, user.token);
       setActive(true);
+      router.back();
     } else {
       result = err;
     }
