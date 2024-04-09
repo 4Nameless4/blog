@@ -35,7 +35,8 @@ export default function RenderView(props: { article: t_article_view }) {
           Update Time: {new Date(`${updateTime} UTC`).toLocaleString()}
         </span>
       </div>
-      <section className={`${style["content-view"]} card-blur`}>
+      <div className={style['divide']}></div>
+      <section className={`${style["content-view"]}`}>
         <Markdown>{content}</Markdown>
       </section>
     </>
