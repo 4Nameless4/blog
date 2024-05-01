@@ -6,17 +6,23 @@ import { TextTitle } from "@/components/text_title";
 import Link from "next/link";
 import style from "./viewPage.module.css";
 
-export default function RenderView(props: { article: t_article_view }) {
-  const { title, content, createTime, updateTime, viewCount, types, userID } =
-    props.article;
+export default function RenderView(props: {
+  article: t_article_view;
+  editable?: boolean;
+}) {
+  const { editable, article } = props;
+  const { title, content, createTime, updateTime, viewCount } =
+    article;
 
-  const edit = (
-    <Button shape="circle">
-      <Link href="?type=edit">
-        <EditOutlined />
-      </Link>
-    </Button>
-  );
+  const edit =
+    (editable && (
+      <Button shape="circle">
+        <Link href="?type=edit">
+          <EditOutlined />
+        </Link>
+      </Button>
+    )) ||
+    null;
 
   return (
     <>
@@ -35,7 +41,7 @@ export default function RenderView(props: { article: t_article_view }) {
           Update Time: {new Date(`${updateTime} UTC`).toLocaleString()}
         </span>
       </div>
-      <div className={style['divide']}></div>
+      <div className={style["divide"]}></div>
       <section className={`${style["content-view"]}`}>
         <Markdown>{content}</Markdown>
       </section>

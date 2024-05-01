@@ -1,6 +1,8 @@
 "use client";
+import { ReadonlyURLSearchParams } from "next/navigation";
 import { aesEncode2base64, base642aesDecode } from "./crypto";
 import { t_route, t_token_user, t_user } from "./types";
+import { deepEqual } from "nameless4-common";
 
 export async function request(url: string, params: RequestInit = {}) {
   const promise = fetch(url, params);
@@ -92,21 +94,92 @@ export function getUserToken() {
   return (user && user.token) || "";
 }
 
-export function formatPath(path: string) {
-  path = path.trim()
+// ?type=1&name=tom
+export function formatSearchStrToObj(searchStr: string) {
+  searchStr = searchStr.replace(/^\?/, "");
+  const search: Record<string, string> = {};
+  let searchArr = searchStr.split("&").filter((d) => !!d);
+  searchArr = searchArr.map((d) => {
+    const data = d.split("=");
+    const key = data[0];
+    if (key) {
+      search[key] = data[1];
+    }
+    return key;
+  });
+  return search;
+}
 
-  path = path.replace(/^\//, "").replace(/\/$/, "")
+/*
+{
+  type: 1,
+  name: "tom"
+}
+*/
+export function formatSearchObjToStr(
+  searchObj: Record<string, string | number>
+) {
+  const keys = Object.keys(searchObj);
+  keys.sort();
+  let searchStr = "";
+  if (keys.length) {
+    searchStr += "?";
+    keys.forEach((k, i) => {
+      const str = `${k}=${searchObj[k]}`;
+      if (i !== 0) {
+        searchStr += "&";
+      }
+      searchStr += str;
+    });
+  }
+  return searchStr;
+}
+
+export function formatPath(
+  path: string,
+  searchStr?: string | Record<string, string>
+) {
+  // path format
+  path = path.trim();
+  if (path.length > 1) {
+    path = path.replace(/^\//, "").replace(/\/$/, "");
+  }
+  const arr = path.split("/").filter((d) => !!d);
+
+  // search format
+  const search =
+    typeof searchStr === "string"
+      ? formatSearchStrToObj(searchStr)
+      : searchStr || {};
+
+  // fullpath format
+  const fullPath = path + formatSearchObjToStr(search);
 
   return {
     path,
-    arr: path.split("/")
+    search,
+    fullPath,
+    arr,
   };
 }
 
-export function matchRoute(path: string, routes: t_route[]): null | t_route {
+export function matchStr(str: string, strOrRegExpStr: string) {
+  if ((str && !strOrRegExpStr) || (!str && strOrRegExpStr)) {
+    return false;
+  }
+  return RegExp(strOrRegExpStr).test(str);
+}
+
+export function matchRoute(
+  path: string,
+  search: string,
+  routes: t_route[]
+): null | t_route {
   let result: null | t_route = null;
-  const format = formatPath(path);
+  // init path
+  const format = formatPath(path, search);
   path = format.path;
+  const fullPath = format.fullPath;
   const currentPathArr = format.arr;
   const currentPathLen = currentPathArr.length;
   const currentPathSet = new Set();
@@ -114,12 +187,16 @@ export function matchRoute(path: string, routes: t_route[]): null | t_route {
     currentPathSet.add(d);
   });
 
+  // each routes
   for (const route of routes) {
-    const _format = formatPath(route.path);
+    const _format = formatPath(route.path, route.search);
     const _path = _format.path;
-    if (_path === path) {
+    const _fullPath = _format.fullPath;
+    if (matchStr(_fullPath, fullPath)) {
+      return route;
+    }
+    if (matchStr(_path, path)) {
       result = route;
-      break;
     }
     const routeArr = _format.arr;
     const routeLen = routeArr.length;
@@ -131,24 +208,23 @@ export function matchRoute(path: string, routes: t_route[]): null | t_route {
     let index = 0;
     for (const d of currentPathArr) {
       const r = routeArr[index];
-      if (index < routeLen) {
-        if (d !== r) {
-          break;
-        }
-      } else if (!children || !children.length) {
+      if (!r && children && children.length) {
+        const rr = matchRoute(
+          currentPathArr.slice(index).join("/"),
+          search,
+          children
+        );
+        rr && (result = rr);
+      }
+      if (!matchStr(r, d)) {
         break;
-      } else {
-        const rr = matchRoute(currentPathArr.slice(index).join("/"), children);
-        if (rr) {
-          result = rr;
-          break;
-        } else {
-          continue
-        }
+      }
+      result = route;
+      if (index >= currentPathLen) {
+        break;
       }
       index++;
     }
-
   }
   return result;
 }

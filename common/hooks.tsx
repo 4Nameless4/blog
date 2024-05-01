@@ -1,5 +1,5 @@
 "use client";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { t_token_user } from "./types";
 import { Spin } from "antd";
@@ -28,11 +28,11 @@ export async function getUser(): Promise<t_token_user | null> {
 
 export function useUser() {
   const router = useRouter();
-  const pathname = usePathname();
 
   useEffect(() => {
     getUser().then((d) => {
-      const match = matchRoute(pathname, routeArr);
+      const location = window.location
+      const match = matchRoute(location.pathname, location.search, routeArr);
       const userRedirect = match && match.userRedirect;
       if (d) {
         setStoreState("user", d);
@@ -40,7 +40,7 @@ export function useUser() {
         router.push(userRedirect);
       }
     });
-  }, [router, pathname]);
+  }, [router]);
 }
 
 export function useLoading(render: () => JSX.Element) {

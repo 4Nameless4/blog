@@ -6,12 +6,14 @@ import { useRef } from "react";
 import { t_article, t_article_view, t_token_user } from "@/common/types";
 import { useRouter } from "next/navigation";
 import RenderRichText from "@/components/rich-text";
+import { useStoreState } from "@/common/store";
 
 export default function EditPage(props: { article?: t_article_view }) {
   const article = props.article;
   const type = article ? "edit" : "new";
   const form = useRef(null);
   const router = useRouter();
+  const user = useStoreState<t_token_user>("user");
 
   function getFormData(): Omit<
     t_article,
@@ -19,11 +21,11 @@ export default function EditPage(props: { article?: t_article_view }) {
   > {
     const data = new FormData(form.current || undefined);
     return {
-      id: "0",
+      id: article ? article.id : "",
       title: data.get("title") as string,
       content: data.get("content") as string,
       types: "",
-      userID: "",
+      userID: user.uuid
     };
   }
 
@@ -35,10 +37,11 @@ export default function EditPage(props: { article?: t_article_view }) {
         autoFocus={true}
         autoComplete="off"
         name="title"
+        defaultValue={article?.title}
       ></input>
       <RenderRichText
         className={`${style["edit-content"]} card-blur`}
-        text=""
+        text={article?.content || ""}
         textareaProps={{
           placeholder: "Please input your article content",
           autoComplete: "off",
@@ -49,24 +52,18 @@ export default function EditPage(props: { article?: t_article_view }) {
       <div className={style["edit-toolbar"]}>
         <Button
           title="Apply"
-          // onClick={async () => {
-          //   if (!user) return;
-
-          //   const formData = getFormData();
-          //   formData.userID = user.uuid;
-          //   if (article) {
-          //     formData.id = article.id;
-          //     updateArticle(formData);
-          //   } else {
-          //     createArticle(formData).then((d) => {
-          //       if (d) {
-          //         router.push(`/article/${d.id}`);
-          //       } else {
-          //         console.error("create article faile");
-          //       }
-          //     });
-          //   }
-          // }}
+          onClick={async () => {
+            debugger
+            const formData = getFormData();
+            let articleID = article?.id || ""
+            if (article) {
+              await updateArticle(formData);
+            } else {
+              const d = await createArticle(formData);
+              articleID = d?.id || "";
+            }
+            router.push(`/article/${articleID}`);
+          }}
         >
           Apply
         </Button>{" "}

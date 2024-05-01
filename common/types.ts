@@ -44,6 +44,7 @@ type t_callback = (request: NextRequest, path: string) => t_callback_returns;
 
 export type t_route = {
   path: string;
+  search?: Record<string, string>;
   icon?: string;
   title?: string;
   callback?: t_callback | t_callback[];

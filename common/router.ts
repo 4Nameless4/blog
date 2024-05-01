@@ -24,6 +24,13 @@ const _routes: t_route[] = [
         path: "new",
         userRedirect: "/login",
       },
+      {
+        path: "**",
+        search: {
+          type: "edit"
+        },
+        userRedirect: "/login",
+      }
     ],
   },
   {
